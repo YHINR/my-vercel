@@ -1,363 +1,722 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>הודעות שלוחה</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      direction: rtl;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הודעות שלוחה 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ECE5DD;
+    --surface:#FFFFFF;
+    --border:#E9E4DC;
+    --text:#111B21;
+    --text-dim:#54656F;
+    --text-faint:#8696A0;
+    --accent:#00A884;
+    --accent-dark:#008069;
+    --header:#008069;
+    --danger:#DC2626;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Assistant',system-ui,sans-serif;
+    color:var(--text);
+    background-color:var(--bg);
+    display:flex;
+    justify-content:center;
+    height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+  svg{display:block;}
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+  /* ===== מסך אימות ===== */
+  #auth-container{
+    width:100%;max-width:400px;margin:auto;background:var(--surface);
+    padding:32px 28px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);
+    text-align:center;display:flex;flex-direction:column;gap:14px;
+  }
+  #auth-container .auth-logo{
+    width:56px;height:56px;border-radius:50%;background:var(--accent);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 4px;color:#fff;
+  }
+  #auth-container .auth-logo svg{width:26px;height:26px;}
+  #auth-container h2{color:var(--header);font-size:1.2rem;font-weight:700;margin-bottom:4px;}
+  .auth-sub{font-size:.82rem;color:var(--text-dim);margin-bottom:6px;}
+  .auth-btn{
+    background:var(--accent);color:#fff;border:none;padding:13px;border-radius:10px;
+    font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;width:100%;
+  }
+  .auth-btn:hover{background:var(--accent-dark);}
+  .auth-btn:disabled{background:#ccc;cursor:not-allowed;}
+  .auth-input{
+    width:100%;padding:13px;font-size:1rem;border:1px solid var(--border);border-radius:10px;
+    text-align:center;font-family:inherit;background:#FAFAFB;
+  }
+  .auth-input:focus{outline:none;border-color:var(--accent);background:#fff;}
+  #auth-status{font-size:.85rem;color:var(--text-dim);min-height:20px;}
+  .error-text{color:var(--danger);font-size:.83rem;display:none;margin-top:2px;}
 
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 400px;
-      width: 100%;
-      padding: 40px;
-      animation: slideUp 0.6s ease-out;
-    }
+  /* ===== מסך הצ'אט ===== */
+  .chat-container{
+    width:100%;max-width:400px;display:none;flex-direction:column;height:100%;
+    background-color:var(--bg);
+    background-image:radial-gradient(circle at 8% 18%, rgba(0,0,0,.02) 0, transparent 45%),
+                      radial-gradient(circle at 92% 82%, rgba(0,0,0,.02) 0, transparent 45%);
+    box-shadow:0 0 30px rgba(0,0,0,.08);
+  }
+  .chat-header{
+    background:var(--header);color:#fff;padding:14px 20px;display:flex;align-items:center;
+    justify-content:space-between;gap:12px;flex-shrink:0;
+  }
+  .chat-header .title-row{display:flex;align-items:center;gap:12px;}
+  .chat-header-icon{
+    width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .chat-header-icon svg{width:20px;height:20px;}
+  .chat-header b{font-size:1.05rem;font-weight:700;}
+  .chat-header span.sub{display:block;font-size:.74rem;color:rgba(255,255,255,.75);font-weight:400;}
+  #refreshBtn{
+    width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
+    color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    transition:background .15s;
+  }
+  #refreshBtn:hover{background:rgba(255,255,255,.22);}
+  #refreshBtn svg{width:18px;height:18px;}
+  #refreshBtn.spin svg{animation:spin .7s linear;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+  .chat-messages{
+    flex-grow:1;padding:18px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;
+  }
+  .status-message{
+    text-align:center;padding:24px 16px;color:var(--text-dim);font-size:.9rem;line-height:1.6;
+  }
+  .status-message.error{color:var(--danger);}
 
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 10px;
-      font-size: 28px;
-    }
+  /* ===== בועת הודעה קולית (בהשראת עיצוב וואטסאפ) ===== */
+  .rec-row{display:flex;align-items:flex-start;max-width:94%;align-self:flex-start;}
+  .rec-bubble{
+    position:relative;width:370px;max-width:100%;background:var(--surface);border:none;
+    border-radius:22px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:8px;
+    box-shadow:0 1px 1px rgba(0,0,0,.08);transition:background .12s;
+  }
+  .rec-bubble:hover{background:#FAFAF9;}
 
-    .subtitle {
-      text-align: center;
-      color: #999;
-      margin-bottom: 30px;
-      font-size: 14px;
-    }
+  .voice-avatar{
+    position:relative;width:38px;height:38px;border-radius:50%;flex-shrink:0;
+    background:var(--border);color:var(--text-faint);display:flex;align-items:center;justify-content:center;
+  }
+  .voice-avatar svg{width:17px;height:17px;}
+  .voice-avatar-badge{
+    position:absolute;bottom:-2px;left:-2px;width:17px;height:17px;border-radius:50%;
+    background:var(--accent);display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);
+  }
+  .voice-avatar-badge svg{width:8px;height:8px;color:#fff;}
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+  .play-btn{
+    width:36px;height:36px;flex-shrink:0;border-radius:50%;background:var(--accent);
+    border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:transform .1s,background .15s;
+  }
+  .play-btn:hover{background:var(--accent-dark);}
+  .play-btn:active{transform:scale(.92);}
+  .play-btn svg{width:14px;height:14px;}
 
-    label {
-      display: block;
-      color: #555;
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
+  .rec-wave-row{flex:1;min-width:0;display:flex;align-items:center;gap:6px;}
+  .waveform{position:relative;flex:1;height:24px;display:flex;align-items:center;gap:1px;cursor:pointer;min-width:0;}
+  .wf-bar{flex:1 1 0;min-width:1px;border-radius:2px;background:#D1D7DB;}
+  .wf-bar.played{background:var(--accent);}
+  .wf-thumb{
+    position:absolute;top:50%;right:0;width:11px;height:11px;border-radius:50%;background:var(--accent);
+    box-shadow:0 1px 2px rgba(0,0,0,.25);transform:translate(50%,-50%);pointer-events:none;transition:right .05s linear;
+  }
+  .rec-time{font-size:.7rem;color:var(--text-faint);flex-shrink:0;min-width:28px;text-align:left;}
+  .rec-title{font-size:.68rem;color:var(--text-faint);margin-top:3px;padding:0 6px;}
 
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: all 0.3s;
-      font-family: inherit;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    input[type="tel"] {
-      direction: ltr;
-      text-align: left;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 30px;
-    }
-
-    button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-family: inherit;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-    }
-
-    .btn-admin {
-      background: #f0f0f0;
-      color: #333;
-      border: 2px solid #e0e0e0;
-    }
-
-    .btn-admin:hover {
-      background: #e0e0e0;
-    }
-
-    .messages-list {
-      margin-top: 30px;
-      padding-top: 30px;
-      border-top: 2px solid #f0f0f0;
-    }
-
-    .message-item {
-      padding: 15px;
-      background: #f9f9f9;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      border-right: 4px solid #667eea;
-    }
-
-    .message-title {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 5px;
-    }
-
-    .message-audio {
-      margin-top: 10px;
-    }
-
-    audio {
-      width: 100%;
-      height: 30px;
-      border-radius: 4px;
-    }
-
-    .status {
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      text-align: center;
-      font-weight: 600;
-      display: none;
-    }
-
-    .status.error {
-      background: #fee;
-      color: #c00;
-      display: block;
-    }
-
-    .status.success {
-      background: #efe;
-      color: #060;
-      display: block;
-    }
-
-    .admin-notice {
-      background: linear-gradient(135deg, #ffa500 0%, #ff7f50 100%);
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .admin-notice a {
-      color: white;
-      text-decoration: underline;
-      font-weight: bold;
-    }
-
-    .loader {
-      display: none;
-      text-align: center;
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    .spinner {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #667eea;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .footer {
-      text-align: center;
-      color: #999;
-      font-size: 12px;
-      margin-top: 20px;
-    }
-  </style>
+  .voice-tooltip{
+    position:fixed;left:0;bottom:0;background:#20272B;color:#fff;border-radius:10px;padding:9px 11px;
+    font-size:.72rem;line-height:1.65;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.28);
+    opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s ease,transform .15s ease;
+    transform:translateY(4px);z-index:1000;text-align:right;
+  }
+  .voice-tooltip::after{
+    content:'';position:absolute;top:100%;left:var(--arrow-x,50%);transform:translateX(-50%);
+    border:5px solid transparent;border-top-color:#20272B;
+  }
+  .voice-tooltip.show{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+  .voice-tooltip b{display:block;font-size:.78rem;margin-bottom:3px;font-weight:600;}
+  .voice-tooltip .tt-row{color:#C3CBD1;}
+  .voice-tooltip .tt-dur span{color:#fff;}
+</style>
 </head>
 <body>
 
-<div class="container">
-  <h1>☎️ הודעות שלוחה</h1>
-  <p class="subtitle">שירות הודעות קוליות מאובטח</p>
+  <!-- מסך אימות -->
+  <div id="auth-container">
+    <div class="auth-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </div>
+    <h2>כניסה למערכת</h2>
+    <div id="auth-status"></div>
 
-  <div class="admin-notice">
-    👨‍💼 <a href="admin.html" target="_blank">לוח ניהול</a> (מנהלים בלבד)
-  </div>
-
-  <div class="status" id="status"></div>
-
-  <form onsubmit="handleSubmit(event)">
-    <div class="form-group">
-      <label for="phone">📱 מספר הטלפון שלך</label>
-      <input 
-        type="tel" 
-        id="phone" 
-        placeholder="0521234567" 
-        required 
-        pattern="^\d{10}$"
-        title="הזן 10 ספרות"
-      >
+    <div id="step-phone">
+      <input type="tel" id="phone-input" class="auth-input" placeholder="הכנס מספר טלפון לאימות">
+      <button id="btn-verify-phone" class="auth-btn" onclick="verifyPhone()" style="margin-top:10px;">אימות טלפון</button>
+      <div id="phone-error" class="error-text">המספר לא מורשה במערכת, הגישה נדחתה.</div>
     </div>
 
-    <div class="form-group">
-      <label for="pin">🔐 קוד הגישה</label>
-      <input 
-        type="password" 
-        id="pin" 
-        placeholder="••••" 
-        required 
-        inputmode="numeric"
-        pattern="^\d+$"
-      >
+    <div id="step-pin" style="display:none;">
+      <input type="password" id="pin-input" class="auth-input" placeholder="הכנס קוד" maxlength="4">
+      <button id="btn-verify-pin" class="auth-btn" onclick="verifyPin()" style="margin-top:10px;">היכנס למערכת</button>
+      <div id="pin-error" class="error-text">קוד שגוי, נסה שוב.</div>
     </div>
+  </div>
 
-    <div class="button-group">
-      <button type="submit" class="btn-primary">הכנס</button>
+  <!-- ממשק הצ'אט -->
+  <div class="chat-container" id="chat-container">
+    <header class="chat-header">
+      <div class="title-row">
+        <div class="chat-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div>
+          <b>הודעות שלוחה 1</b>
+          <span class="sub">תא קולי</span>
+        </div>
+      </div>
+      <button id="refreshBtn" title="רענון" aria-label="רענון">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+    </header>
+
+    <div class="chat-messages" id="messages-list">
+      <div id="status" class="status-message">מתחבר למערכת וטוען הודעות...</div>
     </div>
-  </form>
-
-  <div class="loader" id="loader">
-    <div class="spinner"></div>
-    <p>⏳ בדיקה...</p>
   </div>
-
-  <div class="messages-list" id="messagesList" style="display: none;">
-    <h2>🎵 ההודעות שלך</h2>
-    <div id="messagesContainer"></div>
-  </div>
-
-  <div class="footer">
-    © 2024 שירות הודעות שלוחה - כל הזכויות שמורות
-  </div>
-</div>
 
 <script>
-async function handleSubmit(e) {
-  e.preventDefault();
+  const scriptUrl = "https://script.google.com/macros/s/AKfycby9ezg0BTzxyk26LSdbnRzjQy79UZNaC4SXXmiyYdq5NRQNNKqz5IYbiiU2ILDiaoty/exec";
+  const BAR_COUNT = 28;
 
-  const phone = document.getElementById('phone').value;
-  const pin = document.getElementById('pin').value;
-  const status = document.getElementById('status');
-  const loader = document.getElementById('loader');
-  const messagesList = document.getElementById('messagesList');
+  // ===== אנשי קשר (אופציונלי) =====
+  const CONTACTS_API_URL = "https://sheetdb.io/api/v1/05exs53irv1ll";
 
-  // ניקוי הודעות קודמות
-  status.className = 'status';
-  loader.style.display = 'none';
-  messagesList.style.display = 'none';
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+  const ICON_MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+  const ICON_PERSON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
-  // בדיקת ה-PIN
-  loader.style.display = 'block';
+  // ===== שלב 1 - בדיקת הטלפון בשרת =====
+  async function verifyPhone(){
+    const phoneVal = document.getElementById('phone-input').value.trim();
+    const statusDiv = document.getElementById('auth-status');
+    const btnPhone = document.getElementById('btn-verify-phone');
+    const errorText = document.getElementById('phone-error');
+    if(!phoneVal) return;
 
-  try {
-    const response = await fetch('/api/verify-pin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin, phone })
-    });
+    btnPhone.disabled = true;
+    errorText.style.display = "none";
+    statusDiv.textContent = "בודק הרשאות במערכת, אנא המתן...";
 
-    const result = await response.json();
-
-    if (result.ok) {
-      // הצלחה - שליפת ההודעות
-      status.className = 'status success';
-      status.textContent = '✓ הגישה אושרה! טוען הודעות...';
-
-      const messagesResponse = await fetch('/api/messages');
-      const messagesData = await messagesResponse.json();
-
-      if (messagesData.responseStatus === 'OK' && messagesData.files?.length > 0) {
-        displayMessages(messagesData.files);
-        messagesList.style.display = 'block';
+    try{
+      const response = await fetch(scriptUrl + "?action=verifyPhone&phone=" + encodeURIComponent(phoneVal));
+      const text = await response.text();
+      if(text === "Valid"){
+        // שמור את הטלפון לשימוש בשלב הקוד
+        sessionStorage.setItem('verifiedPhone', phoneVal);
+        
+        statusDiv.textContent = "הטלפון אומת ונשלח צינתוק! הזן את הקוד שהתקבל.";
+        document.getElementById('step-phone').style.display = "none";
+        document.getElementById('step-pin').style.display = "block";
+        document.getElementById('pin-input').focus();
       } else {
-        status.className = 'status success';
-        status.textContent = '✓ אין הודעות חדשות שלך כרגע.';
+        statusDiv.textContent = "";
+        errorText.style.display = "block";
+        btnPhone.disabled = false;
       }
-    } else {
-      // כשל
-      status.className = 'status error';
-      status.textContent = '❌ קוד גישה לא נכון. נסה שוב.';
+    }catch(error){
+      statusDiv.textContent = "אירעה שגיאת תקשורת מול השרת.";
+      btnPhone.disabled = false;
     }
-  } catch (err) {
-    status.className = 'status error';
-    status.textContent = '⚠️ שגיאה בחיבור לשרת. נסה שוב מאוחר יותר.';
-    console.error('Error:', err);
   }
 
-  loader.style.display = 'none';
-}
+  // ===== שלב 2 - אימות הקוד דרך השרת =====
+  async function verifyPin(){
+    const pin = document.getElementById('pin-input').value;
+    const phone = sessionStorage.getItem('verifiedPhone');
+    const errorText = document.getElementById('pin-error');
+    const btnPin = document.getElementById('btn-verify-pin');
 
-function displayMessages(files) {
-  const container = document.getElementById('messagesContainer');
-  container.innerHTML = '';
+    btnPin.disabled = true;
+    errorText.style.display = "none";
 
-  files.forEach(file => {
+    try {
+        const response = await fetch('/api/verify-pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin, phone })
+        });
+        const data = await response.json();
+
+        if (data.ok) {
+            sessionStorage.setItem('phone', phone);
+            
+            // בדיקה אם זה מנהל
+            if (data.isAdmin) {
+                sessionStorage.setItem('isAdmin', 'true');
+                sessionStorage.setItem('adminPin', pin);
+            }
+            
+            document.getElementById('auth-container').style.display = "none";
+            document.getElementById('chat-container').style.display = "flex";
+            
+            // בדוק אם צריך להוסיף כפתור לוח ניהול
+            setTimeout(checkIfAdmin, 300);
+            
+            loadMessages();
+        } else {
+            errorText.style.display = "block";
+            btnPin.disabled = false;
+        }
+    } catch (error) {
+        errorText.textContent = "שגיאת תקשורת, נסה שוב.";
+        errorText.style.display = "block";
+        btnPin.disabled = false;
+    }
+  }
+
+  // ===== בדיקה אם זה מנהל - הוסף כפתור לוח ניהול =====
+  function checkIfAdmin(){
+    const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+    if(isAdmin){
+      const refreshBtn = document.getElementById('refreshBtn');
+      if(refreshBtn && !document.getElementById('admin-dash-btn')){
+        const adminBtn = document.createElement('button');
+        adminBtn.id = 'admin-dash-btn';
+        adminBtn.style.cssText = `
+          width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.15);
+          color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+          transition:background .15s;font-size:18px;margin-left:8px;
+        `;
+        adminBtn.innerHTML = '📊';
+        adminBtn.title = 'לוח ניהול';
+        adminBtn.onmouseover = () => adminBtn.style.background = 'rgba(255,255,255,.22)';
+        adminBtn.onmouseout = () => adminBtn.style.background = 'rgba(255,255,255,.15)';
+        adminBtn.onclick = () => {
+          const pin = sessionStorage.getItem('adminPin');
+          window.open('/admin.html?pin=' + encodeURIComponent(pin), 'admin', 'width=1200,height=800');
+        };
+        refreshBtn.parentNode.insertBefore(adminBtn, refreshBtn);
+      }
+    }
+  }
+
+  document.getElementById('refreshBtn').onclick = () => {
+    document.getElementById('refreshBtn').classList.add('spin');
+    contactsMapPromise = null;
+    loadMessages().finally(() => document.getElementById('refreshBtn').classList.remove('spin'));
+  };
+
+  function setStatus(msg, isError){
+    const messagesList = document.getElementById('messages-list');
+    messagesList.innerHTML = '';
     const div = document.createElement('div');
-    div.className = 'message-item';
-    div.innerHTML = `
-      <div class="message-title">📝 ${file.name}</div>
-      <div class="message-audio">
-        <audio controls>
-          <source src="/api/audio?name=${encodeURIComponent(file.name)}" type="audio/mpeg">
-          הדפדפן שלך לא תומך בהשמעת אודיו
-        </audio>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-</script>
+    div.className = 'status-message' + (isError ? ' error' : '');
+    div.textContent = msg;
+    messagesList.appendChild(div);
+  }
 
+  function fmtTime(sec){
+    if(!isFinite(sec) || sec < 0) sec = 0;
+    const m = Math.floor(sec/60);
+    const s = Math.floor(sec%60);
+    return m + ':' + String(s).padStart(2,'0');
+  }
+  function fmtRemaining(currentTime, duration){
+    if(!isFinite(duration) || duration < 0) return '0:00';
+    return fmtTime(Math.max(0, duration - (currentTime || 0)));
+  }
+
+  function pseudoWaveform(seedStr){
+    let seed = 0;
+    for(let i=0;i<seedStr.length;i++) seed = (seed*31 + seedStr.charCodeAt(i)) >>> 0;
+    const bars = [];
+    for(let i=0;i<BAR_COUNT;i++){
+      seed = (seed*1103515245 + 12345) >>> 0;
+      const v = ((seed >>> 8) % 1000)/1000;
+      bars.push(0.18 + v*0.75);
+    }
+    return bars;
+  }
+
+  let audioCtx = null;
+  function getAudioCtx(){
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  async function computeWaveform(url){
+    try{
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('http ' + res.status);
+      const buf = await res.arrayBuffer();
+      const ctx = getAudioCtx();
+      const audioBuf = await ctx.decodeAudioData(buf.slice(0));
+      const raw = audioBuf.getChannelData(0);
+      const blockSize = Math.max(1, Math.floor(raw.length / BAR_COUNT));
+      const peaks = [];
+      for(let i=0;i<BAR_COUNT;i++){
+        let sum = 0;
+        const start = i*blockSize;
+        for(let j=0;j<blockSize;j++){ sum += Math.abs(raw[start+j] || 0); }
+        peaks.push(sum/blockSize);
+      }
+      const max = Math.max(...peaks, 0.0001);
+      const contentType = res.headers.get('content-type') || 'audio/mpeg';
+      const blobUrl = URL.createObjectURL(new Blob([buf], {type: contentType}));
+      return { peaks: peaks.map(p => Math.max(0.12, p/max)), duration: audioBuf.duration, blobUrl };
+    }catch(err){
+      return null;
+    }
+  }
+
+  let activeAudio = null, activePlayBtn = null, activeSetPlayed = null;
+
+  // ===== משיכת אנשי קשר =====
+  function normalizePhone(raw){
+    let digits = String(raw || '').replace(/\D/g,'');
+    if(!digits) return '';
+    if(digits.startsWith('972')) digits = '0' + digits.slice(3);
+    if(digits.length > 9) digits = digits.slice(-9);
+    return digits;
+  }
+
+  function extractPhoneFromFilename(name){
+    const matches = name.match(/\d{7,}/g);
+    if(!matches) return '';
+    let best = matches.find(m => m.length >= 9 && m.length <= 10) || matches[0];
+    return normalizePhone(best);
+  }
+
+  function extractPhoneFallback(file){
+    const phoneKeyPattern = /^(phone|callerid|caller_id|calleridnum|ani|src|from|number|tel)$/i;
+    for(const key of Object.keys(file || {})){
+      if(!phoneKeyPattern.test(key)) continue;
+      const raw = file[key];
+      if(!raw) continue;
+      const digits = String(raw).replace(/\D/g, '');
+      if(digits.length >= 7) return normalizePhone(digits);
+    }
+    return '';
+  }
+
+  function resolvePhoneForFile(file){
+    return extractPhoneFromFilename(file.name || '') || extractPhoneFallback(file);
+  }
+
+  const AVATAR_COLORS = ['#F06292','#BA68C8','#7986CB','#4FC3F7','#4DB6AC','#81C784','#FFB74D','#A1887F'];
+  function avatarColorFor(str){
+    let seed = 0;
+    for(let i=0;i<str.length;i++) seed = (seed*31 + str.charCodeAt(i)) >>> 0;
+    return AVATAR_COLORS[seed % AVATAR_COLORS.length];
+  }
+  function initialsFor(name){
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if(parts.length === 0) return '?';
+    return parts.length === 1 ? parts[0][0] : (parts[0][0] + parts[parts.length-1][0]);
+  }
+  function contactAvatarHTML(contact){
+    if(contact && contact.photoUrl){
+      return '<img src="' + contact.photoUrl + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+    }
+    if(contact && contact.name){
+      const color = avatarColorFor(contact.name);
+      return '<div style="width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;' +
+        'background:' + color + ';color:#fff;font-weight:600;font-size:.85rem;">' + initialsFor(contact.name) + '</div>';
+    }
+    return ICON_PERSON;
+  }
+
+  let contactsMapPromise = null;
+  function getContactsMap(){
+    if(!CONTACTS_API_URL) return Promise.resolve({});
+    if(contactsMapPromise) return contactsMapPromise;
+    contactsMapPromise = (async () => {
+      try{
+        const res = await fetch(CONTACTS_API_URL);
+        if(!res.ok) throw new Error('http ' + res.status);
+        const data = await res.json();
+        const rows = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+        const map = {};
+        rows.forEach(row => {
+          const phone = normalizePhone(row.Phone || row.phone || '');
+          if(!phone) return;
+          map[phone] = {
+            name: row.Name || row.name || '',
+            photoUrl: row.PhotoUrl || row.photoUrl || row.PhotoURL || ''
+          };
+        });
+        return map;
+      }catch(err){
+        console.error('Contacts fetch error:', err);
+        return {};
+      }
+    })();
+    return contactsMapPromise;
+  }
+
+  function buildMessageBubble(file, audioUrl, contactsMap){
+    contactsMap = contactsMap || {};
+    const phone = resolvePhoneForFile(file);
+    const contact = phone ? contactsMap[phone] : null;
+    const row = document.createElement('div');
+    row.className = 'rec-row';
+
+    const col = document.createElement('div');
+    col.style.display = 'flex';
+    col.style.flexDirection = 'column';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'rec-bubble';
+
+    const avatarWrap = document.createElement('div');
+    avatarWrap.style.position = 'relative';
+    avatarWrap.style.flexShrink = '0';
+    const avatar = document.createElement('div');
+    avatar.className = 'voice-avatar';
+    avatar.innerHTML =
+      '<div style="width:100%;height:100%;">' + contactAvatarHTML(contact) + '</div>' +
+      '<span class="voice-avatar-badge">' + ICON_MIC + '</span>';
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'voice-tooltip';
+    const ttName = document.createElement('b');
+    ttName.textContent = (contact && contact.name) ? contact.name : file.name;
+    tooltip.appendChild(ttName);
+    if(phone){
+      const phoneRow = document.createElement('div');
+      phoneRow.className = 'tt-row';
+      phoneRow.textContent = phone;
+      tooltip.appendChild(phoneRow);
+    }
+    const durRow = document.createElement('div');
+    durRow.className = 'tt-row tt-dur';
+    durRow.innerHTML = 'משך: <span>0:00</span>';
+    tooltip.appendChild(durRow);
+
+    function positionTooltip(){
+      const rect = avatar.getBoundingClientRect();
+      const margin = 8;
+      const centerX = rect.left + rect.width/2;
+      const tw = tooltip.offsetWidth;
+      let left = centerX - tw/2;
+      left = Math.max(margin, Math.min(left, window.innerWidth - tw - margin));
+      tooltip.style.left = left + 'px';
+      tooltip.style.bottom = (window.innerHeight - (rect.top - 9)) + 'px';
+      tooltip.style.setProperty('--arrow-x', (centerX - left) + 'px');
+    }
+    avatarWrap.addEventListener('mouseenter', () => { positionTooltip(); tooltip.classList.add('show'); });
+    avatarWrap.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+    avatarWrap.appendChild(avatar);
+    avatarWrap.appendChild(tooltip);
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'play-btn';
+    playBtn.innerHTML = ICON_PLAY;
+    playBtn.setAttribute('aria-label', 'נגן');
+
+    const waveRow = document.createElement('div');
+    waveRow.className = 'rec-wave-row';
+    const waveform = document.createElement('div');
+    waveform.className = 'waveform';
+    waveform.tabIndex = 0;
+    const bars = [];
+    pseudoWaveform(file.name).forEach(p => {
+      const bar = document.createElement('div');
+      bar.className = 'wf-bar';
+      bar.style.height = Math.round(p*22) + 'px';
+      waveform.appendChild(bar);
+      bars.push(bar);
+    });
+    const thumb = document.createElement('div');
+    thumb.className = 'wf-thumb';
+    waveform.appendChild(thumb);
+
+    const timeLabel = document.createElement('span');
+    timeLabel.className = 'rec-time';
+    timeLabel.textContent = '0:00';
+    waveRow.appendChild(waveform);
+    waveRow.appendChild(timeLabel);
+
+    bubble.appendChild(avatarWrap);
+    bubble.appendChild(playBtn);
+    bubble.appendChild(waveRow);
+
+    const nameLabel = document.createElement('div');
+    nameLabel.className = 'rec-title';
+    nameLabel.textContent = (contact && contact.name) ? contact.name : (phone || file.name);
+
+    col.appendChild(bubble);
+    col.appendChild(nameLabel);
+    row.appendChild(col);
+
+    function setPeaks(peaks){ peaks.forEach((p,i) => { if(bars[i]) bars[i].style.height = Math.round(p*22) + 'px'; }); }
+    function setPlayedRatio(ratio){
+      ratio = Math.max(0, Math.min(1, ratio || 0));
+      const exact = ratio * BAR_COUNT;
+      const cut = Math.floor(exact);
+      const frac = exact - cut;
+      bars.forEach((b,i) => {
+        if(i < cut){ b.classList.add('played'); b.style.background = ''; }
+        else if(i === cut && frac > 0){
+          b.classList.remove('played');
+          const pct = (frac*100).toFixed(1) + '%';
+          b.style.background = 'linear-gradient(to left, var(--accent) ' + pct + ', #D1D7DB ' + pct + ')';
+        } else { b.classList.remove('played'); b.style.background = ''; }
+      });
+      thumb.style.right = (ratio*100) + '%';
+    }
+
+    let waveformDataPromise = null;
+    function getWaveformData(){
+      if(!waveformDataPromise) waveformDataPromise = computeWaveform(audioUrl);
+      return waveformDataPromise;
+    }
+    getWaveformData().then(result => {
+      if(result){
+        setPeaks(result.peaks);
+        if(result.duration){
+          durRow.querySelector('span').textContent = fmtTime(result.duration);
+          if(!audio) timeLabel.textContent = fmtRemaining(0, result.duration);
+        }
+      }
+    });
+
+    let audio = null;
+    let waveRafId = null;
+    let pendingSeekRatio = null;
+
+    function stepWaveform(){
+      if(!audio || audio.paused){ waveRafId = null; return; }
+      setPlayedRatio(audio.duration ? audio.currentTime/audio.duration : 0);
+      waveRafId = requestAnimationFrame(stepWaveform);
+    }
+
+    function ensureAudio(){
+      if(audio) return audio;
+      audio = new Audio(audioUrl);
+      audio.preload = 'auto';
+      audio.addEventListener('loadedmetadata', () => {
+        if(audio.paused) timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
+        if(audio.duration) durRow.querySelector('span').textContent = fmtTime(audio.duration);
+        if(pendingSeekRatio !== null && audio.duration){
+          audio.currentTime = pendingSeekRatio * audio.duration;
+          setPlayedRatio(pendingSeekRatio);
+          timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
+          pendingSeekRatio = null;
+        }
+      });
+      audio.addEventListener('timeupdate', () => {
+        timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
+      });
+      audio.addEventListener('ended', () => {
+        playBtn.innerHTML = ICON_PLAY;
+        setPlayedRatio(0);
+        timeLabel.textContent = fmtRemaining(0, audio.duration);
+        if(activeAudio === audio){ activeAudio = null; activePlayBtn = null; activeSetPlayed = null; }
+        const next = row.nextElementSibling;
+        if(next && next.classList && next.classList.contains('rec-row')){
+          setTimeout(() => {
+            const nextBtn = next.querySelector('.play-btn');
+            if(nextBtn) nextBtn.click();
+          }, 350);
+        }
+      });
+      return audio;
+    }
+
+    playBtn.onclick = () => {
+      ensureAudio();
+      if(activeAudio && activeAudio !== audio){
+        activeAudio.pause();
+        if(activePlayBtn) activePlayBtn.innerHTML = ICON_PLAY;
+        if(activeSetPlayed) activeSetPlayed(0);
+      }
+      if(audio.paused){
+        audio.play();
+        playBtn.innerHTML = ICON_PAUSE;
+        activeAudio = audio; activePlayBtn = playBtn; activeSetPlayed = setPlayedRatio;
+        if(waveRafId === null) waveRafId = requestAnimationFrame(stepWaveform);
+      } else {
+        audio.pause();
+        playBtn.innerHTML = ICON_PLAY;
+      }
+    };
+
+    waveform.onclick = (e) => {
+      ensureAudio();
+      const rect = waveform.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, 1 - ((e.clientX - rect.left) / rect.width)));
+      if(audio.duration && isFinite(audio.duration)){
+        const wasPlaying = !audio.paused;
+        if(wasPlaying) audio.pause();
+        const target = ratio * audio.duration;
+        setPlayedRatio(ratio);
+        timeLabel.textContent = fmtRemaining(target, audio.duration);
+        audio.currentTime = target;
+        if(wasPlaying){
+          const resume = () => {
+            audio.removeEventListener('seeked', resume);
+            audio.play();
+            if(waveRafId === null) waveRafId = requestAnimationFrame(stepWaveform);
+          };
+          audio.addEventListener('seeked', resume);
+        }
+      } else {
+        pendingSeekRatio = ratio;
+        setPlayedRatio(ratio);
+        if(audio.readyState === 0) audio.load();
+      }
+    };
+
+    return row;
+  }
+
+  // ===== משיכת ההודעות הקוליות דרך השרת =====
+  async function loadMessages(){
+    const messagesList = document.getElementById('messages-list');
+    setStatus('טוען הודעות...');
+
+    try{
+      const [response, contactsMap] = await Promise.all([fetch('/api/messages'), getContactsMap()]);
+      const data = await response.json();
+
+      if(data.responseStatus === "OK"){
+        let audioFiles = data.files || [];
+
+        if(audioFiles.length > 0){
+          messagesList.innerHTML = '';
+          audioFiles.forEach(file => {
+            const audioUrl = `/api/audio?name=${encodeURIComponent(file.name)}`;
+            messagesList.appendChild(buildMessageBubble(file, audioUrl, contactsMap));
+          });
+          setTimeout(() => { messagesList.scrollTop = messagesList.scrollHeight; }, 100);
+        } else {
+          setStatus('לא נמצאו הודעות קוליות בשלוחה זו.');
+        }
+      } else {
+        setStatus(`שגיאה מהשרת: ${data.message || 'שגיאה לא ידועה בבקשת הנתונים'}`, true);
+      }
+    }catch(error){
+      console.error('Fetch error:', error);
+      setStatus('שגיאת תקשורת במשיכת ההודעות.', true);
+    }
+  }
+</script>
 </body>
 </html>

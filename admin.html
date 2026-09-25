@@ -146,31 +146,45 @@ let chartInstance = null;
 
 // בדוק אם המנהל מחובר
 function checkAuth() {
-  const auth = localStorage.getItem('adminAuth');
+  // בדוק אם יש PIN בURL (מהכפתור)
+  const urlParams = new URLSearchParams(window.location.search);
+  const pinFromUrl = urlParams.get('pin');
+  
+  if (pinFromUrl) {
+    // נסה כניסה עם ה-PIN מה-URL
+    sessionStorage.setItem('adminAuth', pinFromUrl);
+    localStorage.setItem('adminAuth', pinFromUrl);
+    return true;
+  }
+  
+  const auth = sessionStorage.getItem('adminAuth') || localStorage.getItem('adminAuth');
   if (!auth) {
     document.getElementById('authModal').style.display = 'flex';
     return false;
   }
+  
+  sessionStorage.setItem('adminAuth', auth);
   return true;
 }
 
 // כניסה
 async function loginAdmin() {
-  const pin = document.getElementById('adminPin').value;
+  const phone = document.getElementById('adminPin').value;
   
-  if (!pin) {
+  if (!phone) {
     alert('הזן מספר טלפון');
     return;
   }
 
   try {
-    const response = await fetch(`/api/admin-logs?adminPin=${pin}`);
+    const response = await fetch(`/api/admin-logs?adminPhone=${encodeURIComponent(phone)}`);
     if (response.ok) {
-      localStorage.setItem('adminAuth', pin);
+      sessionStorage.setItem('adminAuth', phone);
+      localStorage.setItem('adminAuth', phone);
       document.getElementById('authModal').style.display = 'none';
       await refreshLogs();
     } else {
-      alert('❌ מספר טלפון לא נכון');
+      alert('❌ מספר טלפון לא מורשה');
     }
   } catch (err) {
     alert('שגיאה בחיבור לשרת: ' + err.message);
@@ -180,16 +194,17 @@ async function loginAdmin() {
 // התנתקות
 function logout() {
   localStorage.removeItem('adminAuth');
+  sessionStorage.removeItem('adminAuth');
   location.reload();
 }
 
 // שליפת לוגים
 async function refreshLogs() {
-  const pin = localStorage.getItem('adminAuth');
-  if (!pin) return;
+  const phone = sessionStorage.getItem('adminAuth') || localStorage.getItem('adminAuth');
+  if (!phone) return;
 
   try {
-    const response = await fetch(`/api/admin-logs?adminPin=${pin}`);
+    const response = await fetch(`/api/admin-logs?adminPhone=${encodeURIComponent(phone)}`);
     const data = await response.json();
 
     if (data.ok) {
