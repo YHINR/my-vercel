@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiIGZpbGw9IiMwMEE4ODQiLz48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMi40IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDYsNikgc2NhbGUoMC41KSIgZD0iTTIyIDE2LjkydjNhMiAyIDAgMCAxLTIuMTggMiAxOS43OSAxOS43OSAwIDAgMS04LjYzLTMuMDcgMTkuNSAxOS41IDAgMCAxLTYtNiAxOS43OSAxOS43OSAwIDAgMS0zLjA3LTguNjdBMiAyIDAgMCAxIDQuMTEgMmgzYTIgMiAwIDAgMSAyIDEuNzJjLjEyNy45Ni4zNjEgMS45MDMuNyAyLjgxYTIgMiAwIDAgMS0uNDUgMi4xMUw4LjA5IDkuOTFhMTYgMTYgMCAwIDAgNiA2bDEuMjctMS4yN2EyIDIgMCAwIDEgMi4xMS0uNDVjLjkwNy4zMzkgMS44NS41NzMgMi44MS43QTIgMiAwIDAgMSAyMiAxNi45MnoiLz48L3N2Zz4=">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiIGZpbGw9IiMwMEE4ODQiLz48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMi40IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDYsNikgc2NhbGUoMC41KSIgZD0iTTIyIDE2LjkydjNhMiAyIDAgMCAxLTIuMTggMiAxOS43OSAxOS43OSAwIDAgMS04LjYzLTMuMDcgMTkuNSAxOS41IDAgMCAxLTYtNiAxOS43OSAxOS43OSAwIDAgMS0zLjA3LTguNjdBMiAyIDAgMCAxIDQuMTEgMmgzYTIgMiAwIDAgMSAyIDEuNzJjLjEyNy45Ni4zNjEgMS45MDMuNyAyLjgxYTIgMiAwIDAgMS0uNDUgMi4xMUw4LjA5IDkuOTFhMTYgMTYgMCAwIDAgNiA2bDEuMjctMS4yN2EyIDIgMCAwIDEgMi4xMS0uNDVjLjkwNy4zMzkgMS44NS41NzMgMi44MS43QTIgMiAwIDAgMSAyMiAxNi45MnoiLz48L3N2Zz4=">
 <title>הודעות שלוחה 1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -706,14 +706,26 @@
   }
   
   function contactAvatarHTML(contact){
-    if(contact && contact.photo){
-      return '<img src="' + contact.photo + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
-    }
-    if(contact && contact.name && !/^[\d\s\-\+]+$/.test(contact.name)){
-      const color = avatarColorFor(contact.name);
+    // שינוי והתאמה מדויקת: רק אם קיים איש קשר (לפי המספר שנמצא במאגר, ללא קשר לאפס בהתחלה) מוצג פרופיל ייחודי.
+    if(contact){
+      if(contact.photo){
+        return '<img src="' + contact.photo + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+      }
+      
+      // במידה ויש לאיש הקשר שם והוא לא סתם מספר - נציג ראשי תיבות צבעוניים
+      if(contact.name && !/^[\d\s\-\+]+$/.test(contact.name)){
+        const color = avatarColorFor(contact.name);
+        return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;' +
+          'background:' + color + ';color:#fff;font-weight:600;font-size:.95rem;">' + initialsFor(contact.name) + '</div>';
+      }
+      
+      // במידה והוא באנשי הקשר, אבל השם הוא עדיין רק מספר או ריק - ניתן לו רקע צבעוני ייחודי מבוסס על המספר עם אייקון
+      const color = avatarColorFor(contact.phone || contact.id || 'default');
       return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;' +
-        'background:' + color + ';color:#fff;font-weight:600;font-size:.95rem;">' + initialsFor(contact.name) + '</div>';
+          'background:' + color + ';color:#fff;">' + ICON_PERSON + '</div>';
     }
+    
+    // במידה והמספר לא קיים כלל באנשי הקשר
     return ICON_PERSON;
   }
 
@@ -773,7 +785,7 @@
   }
 
   function findContactByPhone(phone){
-    const target = normalizePhone(phone);
+    const target = normalizePhone(phone); // מקלף באופן אוטומטי אפסים וקידומת 972 כך שההתאמה תתבצע "ללא 0" במדויק
     if(!target) return null;
     return contactsCache.find(c => normalizePhone(c.phone) === target) || null;
   }
@@ -1022,6 +1034,8 @@
     
     const meta = extractFileMetadata(file);
     const matchedPhone = meta.phone;
+    
+    // שליפה נכונה של איש הקשר בהתבסס על ההתאמה (שתתבצע כעת בצורה חלקה גם ללא 0)
     const contact = matchedPhone ? findContactByPhone(matchedPhone) : null;
     
     let displayPhone = matchedPhone || '';
@@ -1047,7 +1061,9 @@
     const avatar = document.createElement('div');
     avatar.className = 'voice-avatar';
     
-    avatar.innerHTML = '<div class="voice-avatar-img">' + contactAvatarHTML(contact || {name: displayName}) + '</div>' +
+    // שינוי והתאמה מדויקת כאן: כעת אנו מעבירים רק את אובייקט ה-contact האמיתי.
+    // אם הוא null, הפונקציה contactAvatarHTML תחזיר ישירות את האייקון הדיפולטי האפור.
+    avatar.innerHTML = '<div class="voice-avatar-img">' + contactAvatarHTML(contact) + '</div>' +
                        '<span class="voice-avatar-badge">' + ICON_MIC + '</span>';
 
     const tooltip = document.createElement('div');
