@@ -240,10 +240,24 @@
         statusDiv.textContent = "";
         errorText.style.display = "block";
         btnPhone.disabled = false;
+        logAttempt(phoneVal, false, 'מספר טלפון לא מורשה');
       }
     }catch(error){
       statusDiv.textContent = "אירעה שגיאת תקשורת מול השרת.";
       btnPhone.disabled = false;
+    }
+  }
+
+  // ===== רישום ניסיון בלוג (בשקט, בלי לעכב את המשתמש) =====
+  function logAttempt(phone, success, reason, messagesCount){
+    try{
+      fetch('/api/log-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, success, reason, messages_count: messagesCount || 0 })
+      }).catch(err => console.error('Log error:', err));
+    }catch(err){
+      console.error('Log error:', err);
     }
   }
 
