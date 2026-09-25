@@ -167,13 +167,13 @@
     <div id="auth-status"></div>
 
     <div id="step-phone">
-      <input type="tel" id="phone-input" class="auth-input" placeholder="הכנס מספר טלפון לאימות">
+      <input type="tel" id="phone-input" class="auth-input" placeholder="הכנס מספר טלפון לאימות" onkeydown="if(event.key==='Enter'){event.preventDefault();verifyPhone();}">
       <button id="btn-verify-phone" class="auth-btn" onclick="verifyPhone()" style="margin-top:10px;">אימות טלפון</button>
       <div id="phone-error" class="error-text">המספר לא מורשה במערכת, הגישה נדחתה.</div>
     </div>
 
     <div id="step-pin" style="display:none;">
-      <input type="password" id="pin-input" class="auth-input" placeholder="הכנס קוד" maxlength="4">
+      <input type="password" id="pin-input" class="auth-input" placeholder="הכנס קוד" maxlength="4" onkeydown="if(event.key==='Enter'){event.preventDefault();verifyPin();}">
       <button id="btn-verify-pin" class="auth-btn" onclick="verifyPin()" style="margin-top:10px;">היכנס למערכת</button>
       <div id="pin-error" class="error-text">קוד שגוי, נסה שוב.</div>
     </div>
