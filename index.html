@@ -18,6 +18,7 @@
     --text-faint:#8696A0;
     --accent:#00A884;
     --accent-dark:#008069;
+    --mine-bg:#D9FDD3;
     --header:#008069;
     --danger:#DC2626;
   }
@@ -47,7 +48,6 @@
   }
   #auth-container .auth-logo svg{width:26px;height:26px;}
   #auth-container h2{color:var(--header);font-size:1.2rem;font-weight:700;margin-bottom:4px;}
-  .auth-sub{font-size:.82rem;color:var(--text-dim);margin-bottom:6px;}
   .auth-btn{
     background:var(--accent);color:#fff;border:none;padding:13px;border-radius:10px;
     font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;width:100%;
@@ -62,7 +62,7 @@
   #auth-status{font-size:.85rem;color:var(--text-dim);min-height:20px;}
   .error-text{color:var(--danger);font-size:.83rem;display:none;margin-top:2px;}
 
-  /* ===== מסך הצ'אט ===== */
+  /* ===== מסך הצ'אט וההידר ===== */
   .chat-container{
     width:100%;max-width:400px;display:none;flex-direction:column;height:100%;
     background-color:var(--bg);
@@ -85,7 +85,7 @@
   
   .header-actions { display: flex; gap: 8px; align-items: center; }
   .header-actions button{
-    width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
+    width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
     color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
     transition:background .15s;
   }
@@ -102,23 +102,27 @@
   }
   .status-message.error{color:var(--danger);}
 
-  /* ===== בועת הודעה קולית (בהשראת עיצוב וואטסאפ) ===== */
-  .rec-row{display:flex;align-items:flex-start;max-width:94%;align-self:flex-start;}
+  /* ===== בועת הודעה קולית (כולל תמלול) ===== */
+  .rec-row{display:flex;align-items:flex-start;max-width:94%;align-self:flex-start; gap:5px;}
+  .rec-col{display:flex;flex-direction:column;min-width:0;}
+  
   .rec-bubble{
-    position:relative;width:370px;max-width:100%;background:var(--surface);border:none;
+    position:relative;width:330px;max-width:100%;background:var(--surface);border:none;
     border-radius:22px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:8px;
     box-shadow:0 1px 1px rgba(0,0,0,.08);transition:background .12s;
   }
   .rec-bubble:hover{background:#FAFAF9;}
 
+  .voice-avatar-wrap{position:relative;flex-shrink:0;}
   .voice-avatar{
     position:relative;width:38px;height:38px;border-radius:50%;flex-shrink:0;
-    background:var(--border);color:var(--text-faint);display:flex;align-items:center;justify-content:center;
-    overflow:hidden;
+    background:var(--border);color:var(--text-faint);cursor:pointer;
   }
-  .voice-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-  .voice-avatar > svg{width:17px;height:17px;}
-  
+  .voice-avatar-img{
+    width:100%;height:100%;border-radius:50%;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .voice-avatar-img img{width:100%;height:100%;object-fit:cover;display:block;}
   .voice-avatar-badge{
     position:absolute;bottom:-2px;left:-2px;width:17px;height:17px;border-radius:50%;
     background:var(--accent);display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);
@@ -143,8 +147,34 @@
     box-shadow:0 1px 2px rgba(0,0,0,.25);transform:translate(50%,-50%);pointer-events:none;transition:right .05s linear;
   }
   .rec-time{font-size:.7rem;color:var(--text-faint);flex-shrink:0;min-width:28px;text-align:left;}
-  .rec-title{font-size:.68rem;color:var(--text-faint);margin-top:3px;padding:0 6px;}
 
+  /* תמלול */
+  .transcript-wrap{width:330px;max-width:100%;margin-top:2px;}
+  .transcript-btn{
+    background:none;border:none;cursor:pointer;padding:2px 6px;
+    font-size:.76rem;color:var(--accent-dark);display:flex;align-items:center;gap:4px;
+  }
+  .transcript-btn:hover{text-decoration:underline;}
+  .transcript-btn svg{width:13px;height:13px;flex-shrink:0;}
+  .transcript-btn[disabled]{opacity:.6;cursor:default;text-decoration:none;}
+  .transcript-box{
+    background:var(--surface);border-radius:10px;padding:7px 10px;
+    box-shadow:0 1px 1px rgba(0,0,0,.06);
+  }
+  .transcript-text{
+    font-size:.82rem;line-height:1.5;color:var(--text-dim);white-space:pre-wrap;margin:0;
+  }
+  .transcript-text.collapsed{
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .transcript-toggle{
+    background:none;border:none;cursor:pointer;padding:0;margin-top:2px;
+    font-size:.76rem;color:var(--accent-dark);font-weight:600;
+  }
+  .transcript-toggle:hover{text-decoration:underline;}
+  .transcript-text.error{color:var(--danger);}
+
+  /* Tooltips */
   .voice-tooltip{
     position:fixed;left:0;bottom:0;background:#20272B;color:#fff;border-radius:10px;padding:9px 11px;
     font-size:.72rem;line-height:1.65;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.28);
@@ -160,7 +190,7 @@
   .voice-tooltip .tt-row{color:#C3CBD1;}
   .voice-tooltip .tt-dur span{color:#fff;}
 
-  /* ===== Overlays (אנשי קשר, עריכה, חיתוך) ===== */
+  /* ===== Overlays (אנשי קשר, הגדרות) ===== */
   .ov{
     position:fixed;inset:0;background:rgba(15,17,25,.55);
     display:none;align-items:center;justify-content:center;z-index:50;
@@ -266,6 +296,9 @@
         </div>
       </div>
       <div class="header-actions">
+        <button id="settingsBtn" title="הגדרות מתקדמות (Groq API)" aria-label="הגדרות">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
         <button id="contactsBtn" title="אנשי קשר" aria-label="אנשי קשר">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </button>
@@ -335,6 +368,20 @@
       <div class="btnrow">
         <button class="secondary" id="cropCancelBtn">ביטול</button>
         <button class="primary" id="cropConfirmBtn">אישור חיתוך</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודל הגדרות לתמלול הודעות (Groq API) -->
+  <div id="settingsOverlay" class="ov">
+    <div class="ov-box">
+      <h2>הגדרות מתקדמות</h2>
+      <div class="sub">הזן מפתח API כדי לאפשר תמלול אוטומטי להודעות.</div>
+      <label for="speechApiKeyInput">מפתח Groq API (חינם)</label>
+      <input type="text" id="speechApiKeyInput" placeholder="gsk_..." dir="ltr">
+      <div class="btnrow">
+        <button class="secondary" id="closeSettingsBtn">סגירה</button>
+        <button class="primary" id="saveSettingsBtn">שמירה</button>
       </div>
     </div>
   </div>
@@ -433,7 +480,6 @@
             
             setTimeout(checkIfAdmin, 300);
             
-            // טעינת אנשי קשר במקביל להודעות
             fetchContactsFromServer().then(loadMessages);
         } else {
             errorText.style.display = "block";
@@ -459,7 +505,7 @@
           const phone = sessionStorage.getItem('phone');
           window.location.href = '/admin.html?phone=' + encodeURIComponent(phone);
         };
-        headerActions.insertBefore(adminBtn, document.getElementById('contactsBtn'));
+        headerActions.insertBefore(adminBtn, document.getElementById('settingsBtn'));
       }
     }
   }
@@ -467,7 +513,7 @@
   document.getElementById('refreshBtn').onclick = () => {
     document.getElementById('refreshBtn').classList.add('spin');
     fetchContactsFromServer().then(loadMessages).finally(() => {
-      document.getElementById('refreshBtn').classList.remove('spin')
+      document.getElementById('refreshBtn').classList.remove('spin');
     });
   };
 
@@ -536,6 +582,65 @@
 
   let activeAudio = null, activePlayBtn = null, activeSetPlayed = null;
 
+  // ===== ניהול Groq API לתמלול =====
+  const LS_SPEECH_API_KEY = 'yemot_speech_api_key';
+  const LS_TRANSCRIPTS_CACHE = 'yemot_transcripts_cache';
+
+  function getSpeechApiKey(){ return (localStorage.getItem(LS_SPEECH_API_KEY) || '').trim(); }
+  function setSpeechApiKey(key){
+    if(key) localStorage.setItem(LS_SPEECH_API_KEY, key.trim());
+    else localStorage.removeItem(LS_SPEECH_API_KEY);
+  }
+
+  function getCachedTranscript(fileName){
+    try{ const cache = JSON.parse(localStorage.getItem(LS_TRANSCRIPTS_CACHE) || '{}'); return cache[fileName] || null; }
+    catch(err){ return null; }
+  }
+  function setCachedTranscript(fileName, text){
+    try{
+      const cache = JSON.parse(localStorage.getItem(LS_TRANSCRIPTS_CACHE) || '{}');
+      cache[fileName] = text;
+      localStorage.setItem(LS_TRANSCRIPTS_CACHE, JSON.stringify(cache));
+    }catch(err){}
+  }
+
+  document.getElementById('settingsBtn').onclick = () => {
+    document.getElementById('speechApiKeyInput').value = getSpeechApiKey();
+    document.getElementById('settingsOverlay').classList.add('open');
+  };
+  document.getElementById('closeSettingsBtn').onclick = () => document.getElementById('settingsOverlay').classList.remove('open');
+  document.getElementById('saveSettingsBtn').onclick = () => {
+    setSpeechApiKey(document.getElementById('speechApiKeyInput').value);
+    document.getElementById('settingsOverlay').classList.remove('open');
+    loadMessages(); // נטען מחדש כדי להציג את אפשרויות התמלול אם עכשיו יש מפתח
+  };
+
+  async function transcribeAudioUrl(url, fileName){
+    const apiKey = getSpeechApiKey();
+    if(!apiKey) throw new Error('לא הוגדר מפתח API בהגדרות');
+    
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('שגיאה בהורדת ההקלטה');
+    const blob = await res.blob();
+
+    const form = new FormData();
+    form.append('file', blob, fileName || 'audio.wav');
+    form.append('model', 'whisper-large-v3-turbo');
+    form.append('language', 'he');
+    form.append('response_format', 'json');
+
+    const apiRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + apiKey },
+      body: form
+    });
+    const data = await apiRes.json().catch(() => ({}));
+    if(!apiRes.ok){
+      throw new Error((data.error && data.error.message) || 'שגיאה מהשרת המפענח');
+    }
+    return (data.text || '').trim() || '(לא זוהה טקסט בהקלטה)';
+  }
+
   // ===== ניהול אנשי קשר (SheetDB) =====
   
   function normalizePhone(raw){
@@ -565,8 +670,12 @@
     return '';
   }
 
-  function resolvePhoneForFile(file){
-    return extractPhoneFromFilename(file.name || '') || extractPhoneFallback(file);
+  function parsePhoneAndDate(name){
+    const m = (name || '').match(/Phone[-_](\d+)[-_]Date[-_](\d{4}[-_]\d{2}[-_]\d{2}[-_]\d{2}[-_]\d{2}[-_]\d{2})/i);
+    if(!m) return null;
+    const parts = m[2].split(/[-_]/);
+    const dateLabel = parts.length === 6 ? parts[2] + '/' + parts[1] + '/' + parts[0] + ' ' + parts[3] + ':' + parts[4] : m[2];
+    return { phone: m[1], date: dateLabel };
   }
 
   const AVATAR_COLORS = ['#F06292','#BA68C8','#7986CB','#4FC3F7','#4DB6AC','#81C784','#FFB74D','#A1887F'];
@@ -892,38 +1001,52 @@
     reader.readAsDataURL(file);
   };
 
-  // ===== בניית ההודעות =====
+  // ===== בניית ההודעות (+ תמלול ואווטאר צבעוני) =====
 
   function buildMessageBubble(file, audioUrl){
-    const phone = resolvePhoneForFile(file);
-    const contact = phone ? findContactByPhone(phone) : null;
+    
+    // ניסיון לחלץ מספר טלפון מהשם של הקובץ 
+    const phoneInfo = parsePhoneAndDate(file.name);
+    let matchedPhone = phoneInfo ? phoneInfo.phone : null;
+    
+    if(!matchedPhone){
+      // מנסים לחלץ מספר טלפון כלשהו מתוך שם הקובץ למקרה שימות המשיח שמרו אותו בצורה שונה
+      const rawMatches = file.name.match(/\d{9,10}/g);
+      if(rawMatches) matchedPhone = rawMatches[0];
+    }
+    
+    const contact = matchedPhone ? findContactByPhone(matchedPhone) : null;
+    
+    // השם שיוצג, במידה ולא נמצא באנשי הקשר - יציג את שם הקובץ (ויצור עבורו ראשי תיבות וצבע אוטומטיים)
+    const displayName = contact ? contact.name : (matchedPhone || file.name.replace(/\.[^/.]+$/, ""));
     
     const row = document.createElement('div');
     row.className = 'rec-row';
 
     const col = document.createElement('div');
-    col.style.display = 'flex';
-    col.style.flexDirection = 'column';
+    col.className = 'rec-col';
 
     const bubble = document.createElement('div');
     bubble.className = 'rec-bubble';
 
     const avatarWrap = document.createElement('div');
-    avatarWrap.style.position = 'relative';
-    avatarWrap.style.flexShrink = '0';
+    avatarWrap.className = 'voice-avatar-wrap';
     const avatar = document.createElement('div');
     avatar.className = 'voice-avatar';
-    avatar.innerHTML = contactAvatarHTML(contact);
+    
+    // יצירת האווטאר המדויק
+    avatar.innerHTML = '<div class="voice-avatar-img">' + contactAvatarHTML(contact || {name: displayName}) + '</div>' +
+                       '<span class="voice-avatar-badge">' + ICON_MIC + '</span>';
 
     const tooltip = document.createElement('div');
     tooltip.className = 'voice-tooltip';
     const ttName = document.createElement('b');
-    ttName.textContent = contact ? contact.name : (phone || file.name);
+    ttName.textContent = displayName;
     tooltip.appendChild(ttName);
-    if(phone){
+    if(matchedPhone){
       const phoneRow = document.createElement('div');
       phoneRow.className = 'tt-row';
-      phoneRow.textContent = phone;
+      phoneRow.textContent = matchedPhone;
       tooltip.appendChild(phoneRow);
     }
     const durRow = document.createElement('div');
@@ -979,12 +1102,71 @@
     bubble.appendChild(playBtn);
     bubble.appendChild(waveRow);
 
-    const nameLabel = document.createElement('div');
-    nameLabel.className = 'rec-title';
-    nameLabel.textContent = contact ? contact.name : (phone || file.name);
-
     col.appendChild(bubble);
-    col.appendChild(nameLabel);
+
+    // ===== תמלול הודעה =====
+    const transcriptWrap = document.createElement('div');
+    transcriptWrap.className = 'transcript-wrap';
+    col.appendChild(transcriptWrap);
+
+    function renderTranscriptBox(text){
+      transcriptWrap.innerHTML = '';
+      const box = document.createElement('div');
+      box.className = 'transcript-box';
+      const p = document.createElement('p');
+      p.className = 'transcript-text collapsed';
+      p.textContent = text;
+      box.appendChild(p);
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'transcript-toggle';
+      toggle.textContent = 'הצג עוד';
+      toggle.onclick = () => {
+        const expanded = p.classList.toggle('collapsed') === false;
+        toggle.textContent = expanded ? 'הצג פחות' : 'הצג עוד';
+      };
+      box.appendChild(toggle);
+      transcriptWrap.appendChild(box);
+    }
+
+    function renderTranscribeButton(){
+      transcriptWrap.innerHTML = '';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'transcript-btn';
+      btn.innerHTML = ICON_MIC + '<span>תמלול הודעה</span>';
+      
+      const apiKey = getSpeechApiKey();
+      if(!apiKey){
+         btn.disabled = true;
+         btn.title = "יש להגדיר מפתח Groq API בהגדרות למעלה (סמל גלגל השיניים) כדי לאפשר תמלול";
+      }
+
+      btn.onclick = async () => {
+        btn.disabled = true;
+        btn.innerHTML = '<span>מתמלל...</span>';
+        try{
+          const text = await transcribeAudioUrl(audioUrl, file.name);
+          setCachedTranscript(file.name, text);
+          renderTranscriptBox(text);
+        }catch(err){
+          transcriptWrap.innerHTML = '';
+          const errBox = document.createElement('div');
+          errBox.className = 'transcript-box';
+          const errP = document.createElement('p');
+          errP.className = 'transcript-text error';
+          errP.textContent = 'שגיאה בתמלול: ' + err.message;
+          errBox.appendChild(errP);
+          transcriptWrap.appendChild(errBox);
+        }
+      };
+      transcriptWrap.appendChild(btn);
+    }
+
+    const cachedTranscript = getCachedTranscript(file.name);
+    if(cachedTranscript) renderTranscriptBox(cachedTranscript);
+    else renderTranscribeButton();
+
     row.appendChild(col);
 
     function setPeaks(peaks){ peaks.forEach((p,i) => { if(bars[i]) bars[i].style.height = Math.round(p*22) + 'px'; }); }
@@ -1015,6 +1197,8 @@
       }
       return waveformDataPromise;
     }
+    
+    // הפעלה אוטומטית של טעינת הגל במקום IntersectionObserver כדי לפשט
     getWaveformData().then(result => {
       if(result){
         setPeaks(result.peaks);
