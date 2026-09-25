@@ -1,14 +1,14 @@
 // api/admin-logs.js
-// שליפת לוגים מ-Vercel KV - רק למנהל
+// שליפת לוגים מ-Redis (דרך REDIS_URL) - רק למנהל
 
-import { kv } from '@vercel/kv';
+import { getRedis } from '../lib/redis.js';
 
 const ADMIN_PHONE = '0548548689';
 
 async function readLogs() {
-  const data = await kv.get('voicemail_logs');
-  if (!data) return [];
-  return typeof data === 'string' ? JSON.parse(data) : data;
+  const redis = getRedis();
+  const data = await redis.get('voicemail_logs');
+  return data ? JSON.parse(data) : [];
 }
 
 export default async function handler(req, res) {
@@ -52,7 +52,6 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('Admin logs error:', err);
-    // מחזירים את השגיאה האמיתית כדי שאפשר יהיה לראות אותה ב-Network tab בדפדפן
     return res.status(500).json({ ok: false, error: 'Server error', details: String(err && err.message || err) });
   }
 }

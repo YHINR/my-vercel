@@ -1,19 +1,18 @@
 // api/log-attempt.js
-// רישום של כל ניסיון - שמור ב-Vercel KV (Redis)
+// רישום של כל ניסיון - שמור ב-Redis (דרך REDIS_URL)
 
-import { kv } from '@vercel/kv';
+import { getRedis } from '../lib/redis.js';
 
 async function readLogs() {
-  const data = await kv.get('voicemail_logs');
-  if (!data) return [];
-  return typeof data === 'string' ? JSON.parse(data) : data;
+  const redis = getRedis();
+  const data = await redis.get('voicemail_logs');
+  return data ? JSON.parse(data) : [];
 }
 
 async function writeLogs(logs) {
-  // חשוב: בלי try/catch כאן - אם kv.set נכשל (למשל בגלל שאין
-  // חיבור KV/Redis תקין), אנחנו רוצים שהשגיאה תעלה החוצה
-  // ותוחזר ב-JSON, ולא תיבלע בשקט.
-  await kv.set('voicemail_logs', JSON.stringify(logs), { ex: 86400 * 30 });
+  const redis = getRedis();
+  // TTL של 30 יום (בשניות)
+  await redis.set('voicemail_logs', JSON.stringify(logs), 'EX', 86400 * 30);
 }
 
 export default async function handler(req, res) {
@@ -54,7 +53,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, id: entry.id, total: logs.length });
   } catch (err) {
     console.error('Log error:', err);
-    // מחזירים את השגיאה האמיתית כדי שאפשר יהיה לראות אותה ב-Network tab בדפדפן
     return res.status(500).json({ ok: false, error: 'Failed to log attempt', details: String(err && err.message || err) });
   }
 }
