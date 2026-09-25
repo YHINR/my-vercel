@@ -612,7 +612,7 @@
   document.getElementById('saveSettingsBtn').onclick = () => {
     setSpeechApiKey(document.getElementById('speechApiKeyInput').value);
     document.getElementById('settingsOverlay').classList.remove('open');
-    loadMessages(); // נטען מחדש כדי להציג את אפשרויות התמלול אם עכשיו יש מפתח
+    loadMessages();
   };
 
   async function transcribeAudioUrl(url, fileName){
@@ -684,10 +684,11 @@
     for(let i=0;i<str.length;i++) seed = (seed*31 + str.charCodeAt(i)) >>> 0;
     return AVATAR_COLORS[seed % AVATAR_COLORS.length];
   }
+  
   function initialsFor(name){
     const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
     if(parts.length === 0) return '?';
-    return parts.length === 1 ? parts[0][0] : (parts[0][0] + parts[parts.length-1][0]);
+    return parts.length === 1 ? parts[0].charAt(0) : (parts[0].charAt(0) + parts[parts.length-1].charAt(0));
   }
   
   function contactAvatarHTML(contact){
@@ -697,7 +698,7 @@
     if(contact && contact.name){
       const color = avatarColorFor(contact.name);
       return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;' +
-        'background:' + color + ';color:#fff;font-weight:600;font-size:.85rem;">' + initialsFor(contact.name) + '</div>';
+        'background:' + color + ';color:#fff;font-weight:600;font-size:.95rem;">' + initialsFor(contact.name) + '</div>';
     }
     return ICON_PERSON;
   }
@@ -1005,19 +1006,21 @@
 
   function buildMessageBubble(file, audioUrl){
     
-    // ניסיון לחלץ מספר טלפון מהשם של הקובץ 
     const phoneInfo = parsePhoneAndDate(file.name);
     let matchedPhone = phoneInfo ? phoneInfo.phone : null;
     
     if(!matchedPhone){
-      // מנסים לחלץ מספר טלפון כלשהו מתוך שם הקובץ למקרה שימות המשיח שמרו אותו בצורה שונה
-      const rawMatches = file.name.match(/\d{9,10}/g);
-      if(rawMatches) matchedPhone = rawMatches[0];
+      // מנסים לחלץ מספר טלפון כלשהו מתוך שם הקובץ ומאפשרים כל אורך
+      const rawMatches = file.name.match(/\d+/g);
+      if(rawMatches) {
+        // ניקח את רצף הספרות הארוך ביותר שנמצא בשם הקובץ כמספר הטלפון 
+        matchedPhone = rawMatches.sort((a,b) => b.length - a.length)[0];
+      }
     }
     
     const contact = matchedPhone ? findContactByPhone(matchedPhone) : null;
     
-    // השם שיוצג, במידה ולא נמצא באנשי הקשר - יציג את שם הקובץ (ויצור עבורו ראשי תיבות וצבע אוטומטיים)
+    // השם שיוצג, במידה ולא נמצא באנשי הקשר - יציג את המספר
     const displayName = contact ? contact.name : (matchedPhone || file.name.replace(/\.[^/.]+$/, ""));
     
     const row = document.createElement('div');
@@ -1034,7 +1037,6 @@
     const avatar = document.createElement('div');
     avatar.className = 'voice-avatar';
     
-    // יצירת האווטאר המדויק
     avatar.innerHTML = '<div class="voice-avatar-img">' + contactAvatarHTML(contact || {name: displayName}) + '</div>' +
                        '<span class="voice-avatar-badge">' + ICON_MIC + '</span>';
 
@@ -1043,10 +1045,15 @@
     const ttName = document.createElement('b');
     ttName.textContent = displayName;
     tooltip.appendChild(ttName);
-    if(matchedPhone){
+    if(matchedPhone && !contact){
       const phoneRow = document.createElement('div');
       phoneRow.className = 'tt-row';
       phoneRow.textContent = matchedPhone;
+      tooltip.appendChild(phoneRow);
+    } else if(contact && contact.phone){
+      const phoneRow = document.createElement('div');
+      phoneRow.className = 'tt-row';
+      phoneRow.textContent = contact.phone;
       tooltip.appendChild(phoneRow);
     }
     const durRow = document.createElement('div');
@@ -1198,7 +1205,6 @@
       return waveformDataPromise;
     }
     
-    // הפעלה אוטומטית של טעינת הגל במקום IntersectionObserver כדי לפשט
     getWaveformData().then(result => {
       if(result){
         setPeaks(result.peaks);
