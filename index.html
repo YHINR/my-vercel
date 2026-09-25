@@ -309,8 +309,8 @@
         adminBtn.onmouseover = () => adminBtn.style.background = 'rgba(255,255,255,.22)';
         adminBtn.onmouseout = () => adminBtn.style.background = 'rgba(255,255,255,.15)';
         adminBtn.onclick = () => {
-          const pin = sessionStorage.getItem('adminPin');
-          window.open('/admin.html?pin=' + encodeURIComponent(pin), 'admin', 'width=1200,height=800');
+          const phone = sessionStorage.getItem('phone');
+          window.location.href = '/admin.html?phone=' + encodeURIComponent(phone);
         };
         refreshBtn.parentNode.insertBefore(adminBtn, refreshBtn);
       }
