@@ -1,22 +1,9 @@
 // api/log-attempt.js
-// רישום של כל ניסיון: מי התקשר, מתי, והאם הצליח
+// רישום של כל ניסיון בזיכרון (בתוך התהליך הנוכחי)
 
-import fs from 'fs/promises';
-import path from 'path';
-
-const LOG_FILE = '/tmp/voicemail_logs.json';
-
-async function readLogs() {
-  try {
-    const data = await fs.readFile(LOG_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-async function writeLogs(logs) {
-  await fs.writeFile(LOG_FILE, JSON.stringify(logs, null, 2));
+// משתנה גלובלי לשמירת הלוגים בתוך התהליך הנוכחי
+if (!global.VOICEMAIL_LOGS) {
+  global.VOICEMAIL_LOGS = [];
 }
 
 export default async function handler(req, res) {
@@ -31,8 +18,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'Phone number required' });
     }
 
-    const logs = await readLogs();
-
     const entry = {
       id: Date.now().toString(),
       phone,
@@ -43,14 +28,15 @@ export default async function handler(req, res) {
       ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
     };
 
-    logs.push(entry);
+    // הוסף ללוגים בזיכרון
+    global.VOICEMAIL_LOGS.push(entry);
 
     // שמור רק את ה-1000 הרשומות האחרונות
-    if (logs.length > 1000) {
-      logs.splice(0, logs.length - 1000);
+    if (global.VOICEMAIL_LOGS.length > 1000) {
+      global.VOICEMAIL_LOGS.splice(0, global.VOICEMAIL_LOGS.length - 1000);
     }
 
-    await writeLogs(logs);
+    console.log(`✓ רישום: ${phone} - ${success ? 'הצלחה' : 'כשל'}`);
 
     return res.status(200).json({ ok: true, id: entry.id });
   } catch (err) {
