@@ -646,36 +646,31 @@
   function normalizePhone(raw){
     let digits = String(raw || '').replace(/\D/g,'');
     if(!digits) return '';
-    if(digits.startsWith('972')) digits = '0' + digits.slice(3);
-    if(digits.length > 9) digits = digits.slice(-9);
+    if(digits.startsWith('972')) digits = digits.slice(3);
+    // קילוף האפסים בהתחלה כפי שמוגדר בגיליון
+    while(digits.startsWith('0')) digits = digits.substring(1);
     return digits;
   }
 
-  function extractPhoneFromFilename(name){
-    const matches = name.match(/\d{7,}/g);
-    if(!matches) return '';
-    let best = matches.find(m => m.length >= 9 && m.length <= 10) || matches[0];
-    return normalizePhone(best);
-  }
-
-  function extractPhoneFallback(file){
+  function resolvePhoneForFile(file){
+    // 1. חיפוש נתוני הטלפון מתוך המאפיינים הנסתרים שהשרת שולח
     const phoneKeyPattern = /^(phone|callerid|caller_id|calleridnum|ani|src|from|number|tel)$/i;
     for(const key of Object.keys(file || {})){
-      if(!phoneKeyPattern.test(key)) continue;
-      const raw = file[key];
-      if(!raw) continue;
-      const digits = String(raw).replace(/\D/g, '');
-      if(digits.length >= 7) return normalizePhone(digits);
+      if(phoneKeyPattern.test(key) && file[key]){
+        const digits = String(file[key]).replace(/\D/g, '');
+        if(digits.length >= 7) return digits;
+      }
     }
-    return '';
-  }
+    // 2. חילוץ מתוך שם הקובץ אם הוא במבנה Phone_XXX
+    const m = (file.name || '').match(/Phone[-_](\d+)/i);
+    if(m && m[1].length >= 7) return m[1];
 
-  function parsePhoneAndDate(name){
-    const m = (name || '').match(/Phone[-_](\d+)[-_]Date[-_](\d{4}[-_]\d{2}[-_]\d{2}[-_]\d{2}[-_]\d{2}[-_]\d{2})/i);
-    if(!m) return null;
-    const parts = m[2].split(/[-_]/);
-    const dateLabel = parts.length === 6 ? parts[2] + '/' + parts[1] + '/' + parts[0] + ' ' + parts[3] + ':' + parts[4] : m[2];
-    return { phone: m[1], date: dateLabel };
+    // 3. חילוץ רצף הספרות הארוך ביותר משם הקובץ 
+    const rawMatches = (file.name || '').match(/\d{7,}/g);
+    if(rawMatches) {
+       return rawMatches.sort((a,b) => b.length - a.length)[0];
+    }
+    return null;
   }
 
   const AVATAR_COLORS = ['#F06292','#BA68C8','#7986CB','#4FC3F7','#4DB6AC','#81C784','#FFB74D','#A1887F'];
@@ -1006,22 +1001,17 @@
 
   function buildMessageBubble(file, audioUrl){
     
-    const phoneInfo = parsePhoneAndDate(file.name);
-    let matchedPhone = phoneInfo ? phoneInfo.phone : null;
-    
-    if(!matchedPhone){
-      // מנסים לחלץ מספר טלפון כלשהו מתוך שם הקובץ ומאפשרים כל אורך
-      const rawMatches = file.name.match(/\d+/g);
-      if(rawMatches) {
-        // ניקח את רצף הספרות הארוך ביותר שנמצא בשם הקובץ כמספר הטלפון 
-        matchedPhone = rawMatches.sort((a,b) => b.length - a.length)[0];
-      }
-    }
-    
+    const matchedPhone = resolvePhoneForFile(file);
     const contact = matchedPhone ? findContactByPhone(matchedPhone) : null;
     
-    // השם שיוצג, במידה ולא נמצא באנשי הקשר - יציג את המספר
-    const displayName = contact ? contact.name : (matchedPhone || file.name.replace(/\.[^/.]+$/, ""));
+    let displayPhone = matchedPhone || '';
+    if(displayPhone && !displayPhone.startsWith('0') && !displayPhone.startsWith('972')) {
+       displayPhone = '0' + displayPhone; 
+    } else if (displayPhone.startsWith('972')) {
+       displayPhone = '0' + displayPhone.slice(3);
+    }
+    
+    const displayName = contact ? contact.name : (displayPhone || file.name.replace(/\.[^/.]+$/, ""));
     
     const row = document.createElement('div');
     row.className = 'rec-row';
@@ -1045,15 +1035,16 @@
     const ttName = document.createElement('b');
     ttName.textContent = displayName;
     tooltip.appendChild(ttName);
+    
     if(matchedPhone && !contact){
       const phoneRow = document.createElement('div');
       phoneRow.className = 'tt-row';
-      phoneRow.textContent = matchedPhone;
+      phoneRow.textContent = displayPhone;
       tooltip.appendChild(phoneRow);
     } else if(contact && contact.phone){
       const phoneRow = document.createElement('div');
       phoneRow.className = 'tt-row';
-      phoneRow.textContent = contact.phone;
+      phoneRow.textContent = '0' + normalizePhone(contact.phone);
       tooltip.appendChild(phoneRow);
     }
     const durRow = document.createElement('div');
