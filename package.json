@@ -4,6 +4,6 @@
   "description": "Voicemail system with admin dashboard",
   "private": true,
   "dependencies": {
-    "@vercel/kv": "^0.2.4"
+    "ioredis": "^5.4.1"
   }
 }
