@@ -2,6 +2,7 @@
 // בדיקת קוד ה-PIN + רישום בלוג בשקט
 
 import { getMessages } from '../lib/call2all.js';
+import { getRedis } from '../lib/redis.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -10,13 +11,26 @@ export default async function handler(req, res) {
 
   try {
     const { pin, phone } = req.body || {};
-    const correctPin = process.env.PIN_CODE;
 
-    if (!correctPin) {
-      return res.status(500).json({ ok: false, error: 'PIN not configured on server' });
+    if (!phone) {
+      return res.status(400).json({ ok: false, error: 'Phone required' });
     }
 
-    const success = String(pin) === String(correctPin);
+    // הקוד נשמר ב-Redis לפי הטלפון ע"י api/store-pin.js, מיד אחרי שה-Apps Script הגריל אותו
+    const redis = getRedis();
+    const storedCode = await redis.get(`pin:${phone}`);
+
+    // אין קוד שמור = פג תוקף (5 דקות) או שמעולם לא נשלח אימות לטלפון הזה
+    const success = storedCode !== null && String(pin) === String(storedCode);
+
+    // קוד חד-פעמי - נמחק מיד לאחר שימוש מוצלח, כדי שלא יהיה שימוש חוזר
+    if (success) {
+      try {
+        await redis.del(`pin:${phone}`);
+      } catch (delErr) {
+        console.error('Pin delete error:', delErr);
+      }
+    }
 
     // אם הכניסה הצליחה - נמשוך כמה הודעות קוליות יש כרגע, לצורך הלוג
     let messagesCount = 0;
