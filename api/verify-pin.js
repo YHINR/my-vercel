@@ -1,6 +1,8 @@
 // api/verify-pin.js
 // בדיקת קוד ה-PIN + רישום בלוג בשקט
 
+import { getMessages } from '../lib/call2all.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
@@ -15,6 +17,20 @@ export default async function handler(req, res) {
     }
 
     const success = String(pin) === String(correctPin);
+
+    // אם הכניסה הצליחה - נמשוך כמה הודעות קוליות יש כרגע, לצורך הלוג
+    let messagesCount = 0;
+    if (success) {
+      try {
+        const token = process.env.CALL2ALL_TOKEN;
+        if (token) {
+          const result = await getMessages(token, 'ivr2:1');
+          if (result.ok) messagesCount = result.files.length;
+        }
+      } catch (countErr) {
+        console.error('Message count error:', countErr);
+      }
+    }
 
     // רישום בלוג בשקט - לא משנה אם הצליח או לא
     // חשוב: יש להמתין (await) לקריאה הזו! בלי await, וורסל עלול "לסגור"
@@ -31,7 +47,8 @@ export default async function handler(req, res) {
           body: JSON.stringify({
             phone,
             success,
-            reason: success ? 'PIN correct' : 'PIN incorrect',
+            reason: success ? 'קוד נכון' : 'קוד שגוי',
+            messages_count: messagesCount,
           }),
         }).catch(err => console.error('Log error:', err));
       } catch (logErr) {
