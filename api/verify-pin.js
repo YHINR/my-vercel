@@ -1,5 +1,5 @@
 // api/verify-pin.js
-// בדיקת קוד ה-PIN + רישום של כל ניסיון
+// בדיקת קוד ה-PIN + רישום בלוג בשקט
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,10 +16,14 @@ export default async function handler(req, res) {
 
     const success = String(pin) === String(correctPin);
 
-    // רישום של הניסיון (גם אם כשל)
+    // רישום בלוג בשקט - לא משנה אם הצליח או לא
     if (phone) {
       try {
-        await fetch(`${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/api/log-attempt`, {
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const host = req.headers['x-forwarded-host'] || req.headers.host;
+        const logUrl = `${protocol}://${host}/api/log-attempt`;
+        
+        fetch(logUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -27,14 +31,14 @@ export default async function handler(req, res) {
             success,
             reason: success ? 'PIN correct' : 'PIN incorrect',
           }),
-        }).catch(err => console.error('Failed to log attempt:', err));
+        }).catch(err => console.error('Log error:', err));
       } catch (logErr) {
         console.error('Logging error:', logErr);
       }
     }
 
     if (success) {
-      return res.status(200).json({ ok: true });
+      return res.status(200).json({ ok: true, isAdmin: phone === '0548548689' });
     } else {
       return res.status(401).json({ ok: false });
     }

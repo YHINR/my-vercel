@@ -17,11 +17,19 @@ async function readLogs() {
 
 export default async function handler(req, res) {
   try {
-    // בדיקה של ה-PIN או הטלפון הנוכחי
-    const { adminPin } = req.query;
+    // בדיקה של מספר הטלפון או ה-PIN
+    const { adminPin, adminPhone } = req.query;
+    const ADMIN_PHONE = '0548548689';
 
-    // בדוק אם היוזר זה המנהל
-    if (adminPin !== process.env.ADMIN_PIN && adminPin !== '0548548689') {
+    // בדוק אם היוזר זה המנהל - ע"י טלפון או PIN
+    const isAuthorized = (
+      adminPhone === ADMIN_PHONE || 
+      adminPhone === process.env.ADMIN_PHONE ||
+      adminPin === process.env.ADMIN_PIN ||
+      adminPin === '0548548689'
+    );
+    
+    if (!isAuthorized) {
       return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }
 
