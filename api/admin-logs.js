@@ -1,7 +1,19 @@
 // api/admin-logs.js
-// שליפת לוגים - רק למנהל שהטלפון שלו הוא 0548548689
+// שליפת לוגים מ-Vercel KV - רק למנהל
+
+import { kv } from '@vercel/kv';
 
 const ADMIN_PHONE = '0548548689';
+
+async function readLogs() {
+  try {
+    const data = await kv.get('voicemail_logs');
+    return data ? JSON.parse(data) : [];
+  } catch (err) {
+    console.error('Error reading from KV:', err);
+    return [];
+  }
+}
 
 export default async function handler(req, res) {
   try {
@@ -12,8 +24,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }
 
-    // קרא את הלוגים מהזיכרון הגלובלי (משותף בתוך התהליך)
-    const logs = global.VOICEMAIL_LOGS || [];
+    const logs = await readLogs();
 
     // סטטיסטיקה
     const stats = {
@@ -35,6 +46,8 @@ export default async function handler(req, res) {
       time: new Date(log.timestamp).toLocaleTimeString('he-IL'),
       date: new Date(log.timestamp).toLocaleDateString('he-IL'),
     }));
+
+    console.log(`📊 Admin access: ${adminPhone} - ${logs.length} logs`);
 
     return res.status(200).json({
       ok: true,

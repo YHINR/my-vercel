@@ -1,9 +1,24 @@
 // api/log-attempt.js
-// רישום של כל ניסיון בזיכרון (בתוך התהליך הנוכחי)
+// רישום של כל ניסיון - שמור ב-Vercel KV (Redis)
 
-// משתנה גלובלי לשמירת הלוגים בתוך התהליך הנוכחי
-if (!global.VOICEMAIL_LOGS) {
-  global.VOICEMAIL_LOGS = [];
+import { kv } from '@vercel/kv';
+
+async function readLogs() {
+  try {
+    const data = await kv.get('voicemail_logs');
+    return data ? JSON.parse(data) : [];
+  } catch (err) {
+    console.error('Error reading logs from KV:', err);
+    return [];
+  }
+}
+
+async function writeLogs(logs) {
+  try {
+    await kv.set('voicemail_logs', JSON.stringify(logs), { ex: 86400 * 30 }); // שמור 30 ימים
+  } catch (err) {
+    console.error('Error writing logs to KV:', err);
+  }
 }
 
 export default async function handler(req, res) {
@@ -18,6 +33,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'Phone number required' });
     }
 
+    const logs = await readLogs();
+
     const entry = {
       id: Date.now().toString(),
       phone,
@@ -28,17 +45,18 @@ export default async function handler(req, res) {
       ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
     };
 
-    // הוסף ללוגים בזיכרון
-    global.VOICEMAIL_LOGS.push(entry);
+    logs.push(entry);
 
-    // שמור רק את ה-1000 הרשומות האחרונות
-    if (global.VOICEMAIL_LOGS.length > 1000) {
-      global.VOICEMAIL_LOGS.splice(0, global.VOICEMAIL_LOGS.length - 1000);
+    // שמור רק את ה-5000 הרשומות האחרונות
+    if (logs.length > 5000) {
+      logs.splice(0, logs.length - 5000);
     }
 
-    console.log(`✓ רישום: ${phone} - ${success ? 'הצלחה' : 'כשל'}`);
+    await writeLogs(logs);
 
-    return res.status(200).json({ ok: true, id: entry.id });
+    console.log(`✓ רישום: ${phone} - ${success ? 'הצלחה' : 'כשל'} (סה"כ: ${logs.length})`);
+
+    return res.status(200).json({ ok: true, id: entry.id, total: logs.length });
   } catch (err) {
     console.error('Log error:', err);
     return res.status(500).json({ ok: false, error: 'Failed to log attempt' });
