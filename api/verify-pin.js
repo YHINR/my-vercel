@@ -17,13 +17,15 @@ export default async function handler(req, res) {
     const success = String(pin) === String(correctPin);
 
     // רישום בלוג בשקט - לא משנה אם הצליח או לא
+    // חשוב: יש להמתין (await) לקריאה הזו! בלי await, וורסל עלול "לסגור"
+    // את הפונקציה לפני שה-fetch מספיק להגיע ל-log-attempt, והרישום פשוט נחתך.
     if (phone) {
       try {
         const protocol = req.headers['x-forwarded-proto'] || 'https';
         const host = req.headers['x-forwarded-host'] || req.headers.host;
         const logUrl = `${protocol}://${host}/api/log-attempt`;
-        
-        fetch(logUrl, {
+
+        await fetch(logUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
