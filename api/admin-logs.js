@@ -35,12 +35,12 @@ export default async function handler(req, res) {
       }).length,
     };
 
-    // עיצוב הלוגים
+    // עיצוב הלוגים - לפי שעון ישראל (השרת רץ ב-UTC כברירת מחדל)
     const logsWithDetails = logs.map(log => ({
       ...log,
-      dateTime: new Date(log.timestamp).toLocaleString('he-IL'),
-      time: new Date(log.timestamp).toLocaleTimeString('he-IL'),
-      date: new Date(log.timestamp).toLocaleDateString('he-IL'),
+      dateTime: new Date(log.timestamp).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' }),
+      time: new Date(log.timestamp).toLocaleTimeString('he-IL', { timeZone: 'Asia/Jerusalem' }),
+      date: new Date(log.timestamp).toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' }),
     }));
 
     console.log(`📊 Admin access: ${adminPhone} - ${logs.length} logs`);
