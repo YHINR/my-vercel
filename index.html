@@ -188,7 +188,7 @@
   .voice-tooltip.show{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
   .voice-tooltip b{display:block;font-size:.78rem;margin-bottom:3px;font-weight:600;}
   .voice-tooltip .tt-row{color:#C3CBD1;}
-  .voice-tooltip .tt-dur span{color:#fff;}
+  .voice-tooltip .tt-row span{color:#fff;}
 
   /* ===== Overlays (אנשי קשר, הגדרות) ===== */
   .ov{
@@ -652,25 +652,44 @@
     return digits;
   }
 
-  function resolvePhoneForFile(file){
-    // 1. חיפוש נתוני הטלפון מתוך המאפיינים הנסתרים שהשרת שולח
-    const phoneKeyPattern = /^(phone|callerid|caller_id|calleridnum|ani|src|from|number|tel)$/i;
-    for(const key of Object.keys(file || {})){
-      if(phoneKeyPattern.test(key) && file[key]){
-        const digits = String(file[key]).replace(/\D/g, '');
-        if(digits.length >= 7) return digits;
-      }
-    }
-    // 2. חילוץ מתוך שם הקובץ אם הוא במבנה Phone_XXX
-    const m = (file.name || '').match(/Phone[-_](\d+)/i);
-    if(m && m[1].length >= 7) return m[1];
+  // חילוץ חכם של מטא-דאטה מהקובץ (טלפון, תאריך ושעה) 
+  function extractFileMetadata(file){
+    let phone = null;
+    let dateStr = '';
+    let timeStr = '';
 
-    // 3. חילוץ רצף הספרות הארוך ביותר משם הקובץ 
-    const rawMatches = (file.name || '').match(/\d{7,}/g);
-    if(rawMatches) {
-       return rawMatches.sort((a,b) => b.length - a.length)[0];
+    // 1. ניסיון לחלץ מהשם לפי פורמט מלא Phone_XXX_Date_YYYY_MM_DD_HH_MM_SS
+    const m = (file.name || '').match(/Phone[-_](\d+)[-_]Date[-_](\d{4})[-_](\d{2})[-_](\d{2})[-_](\d{2})[-_](\d{2})[-_](\d{2})/i);
+    if(m){
+        phone = m[1];
+        dateStr = m[4] + '/' + m[3] + '/' + m[2];
+        timeStr = m[5] + ':' + m[6];
+    } else {
+        // חילוץ תאריך ושעה מהשרת (במידה וקיימים מאפיינים נסתרים)
+        const ts = file.mtime || file.date || file.time || file.created;
+        if(ts){
+            const d = new Date(ts);
+            if(!isNaN(d.getTime())){
+                dateStr = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth()+1).padStart(2, '0') + '/' + d.getFullYear();
+                timeStr = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            }
+        }
+        
+        // 2. חילוץ טלפון ממאפיינים נסתרים של השרת
+        const phoneKeyPattern = /^(phone|callerid|caller_id|calleridnum|ani|src|from|number|tel)$/i;
+        for(const key of Object.keys(file || {})){
+          if(phoneKeyPattern.test(key) && file[key]){
+            const digits = String(file[key]).replace(/\D/g, '');
+            if(digits.length >= 7) { phone = digits; break; }
+          }
+        }
+        // 3. חילוץ המספר הארוך ביותר משם הקובץ למקרה ואין נתונים מהשרת
+        if(!phone){
+           const rawMatches = (file.name || '').match(/\d+/g);
+           if(rawMatches) phone = rawMatches.sort((a,b) => b.length - a.length)[0];
+        }
     }
-    return null;
+    return { phone, dateStr, timeStr };
   }
 
   const AVATAR_COLORS = ['#F06292','#BA68C8','#7986CB','#4FC3F7','#4DB6AC','#81C784','#FFB74D','#A1887F'];
@@ -1001,7 +1020,8 @@
 
   function buildMessageBubble(file, audioUrl){
     
-    const matchedPhone = resolvePhoneForFile(file);
+    const meta = extractFileMetadata(file);
+    const matchedPhone = meta.phone;
     const contact = matchedPhone ? findContactByPhone(matchedPhone) : null;
     
     let displayPhone = matchedPhone || '';
@@ -1032,21 +1052,26 @@
 
     const tooltip = document.createElement('div');
     tooltip.className = 'voice-tooltip';
+    
+    // בניית תוכן הטולטיפ בהתאם לעיצוב באתר השני 
     const ttName = document.createElement('b');
     ttName.textContent = displayName;
     tooltip.appendChild(ttName);
     
-    if(matchedPhone && !contact){
-      const phoneRow = document.createElement('div');
-      phoneRow.className = 'tt-row';
-      phoneRow.textContent = displayPhone;
-      tooltip.appendChild(phoneRow);
-    } else if(contact && contact.phone){
-      const phoneRow = document.createElement('div');
-      phoneRow.className = 'tt-row';
-      phoneRow.textContent = '0' + normalizePhone(contact.phone);
-      tooltip.appendChild(phoneRow);
+    if(meta.dateStr){
+        const dateRow = document.createElement('div');
+        dateRow.className = 'tt-row';
+        dateRow.innerHTML = 'תאריך: <span>' + meta.dateStr + '</span>';
+        tooltip.appendChild(dateRow);
     }
+    
+    if(meta.timeStr){
+        const timeRow = document.createElement('div');
+        timeRow.className = 'tt-row';
+        timeRow.innerHTML = 'שעה: <span>' + meta.timeStr + '</span>';
+        tooltip.appendChild(timeRow);
+    }
+
     const durRow = document.createElement('div');
     durRow.className = 'tt-row tt-dur';
     durRow.innerHTML = 'משך: <span>0:00</span>';
