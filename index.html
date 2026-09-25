@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiIGZpbGw9IiMwMEE4ODQiLz48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMi40IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDYsNikgc2NhbGUoMC41KSIgZD0iTTIyIDE2LjkydjNhMiAyIDAgMCAxLTIuMTggMiAxOS43OSAxOS43OSAwIDAgMS04LjYzLTMuMDcgMTkuNSAxOS41IDAgMCAxLTYtNiAxOS43OSAxOS43OSAwIDAgMS0zLjA3LTguNjdBMiAyIDAgMCAxIDQuMTEgMmgzYTIgMiAwIDAgMSAyIDEuNzJjLjEyNy45Ni4zNjEgMS45MDMuNyAyLjgxYTIgMiAwIDAgMS0uNDUgMi4xMUw4LjA5IDkuOTFhMTYgMTYgMCAwIDAgNiA2bDEuMjctMS4yN2EyIDIgMCAwIDEgMi4xMS0uNDVjLjkwNy4zMzkgMS44NS41NzMgMi44MS43QTIgMiAwIDAgMSAyMiAxNi45MnoiLz48L3N2Zz4=">
 <title>הודעות שלוחה 1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +17,6 @@
     --text-faint:#8696A0;
     --accent:#00A884;
     --accent-dark:#008069;
-    --mine-bg:#D9FDD3;
     --header:#008069;
     --danger:#DC2626;
   }
@@ -48,6 +46,7 @@
   }
   #auth-container .auth-logo svg{width:26px;height:26px;}
   #auth-container h2{color:var(--header);font-size:1.2rem;font-weight:700;margin-bottom:4px;}
+  .auth-sub{font-size:.82rem;color:var(--text-dim);margin-bottom:6px;}
   .auth-btn{
     background:var(--accent);color:#fff;border:none;padding:13px;border-radius:10px;
     font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;width:100%;
@@ -62,7 +61,7 @@
   #auth-status{font-size:.85rem;color:var(--text-dim);min-height:20px;}
   .error-text{color:var(--danger);font-size:.83rem;display:none;margin-top:2px;}
 
-  /* ===== מסך הצ'אט וההידר ===== */
+  /* ===== מסך הצ'אט ===== */
   .chat-container{
     width:100%;max-width:400px;display:none;flex-direction:column;height:100%;
     background-color:var(--bg);
@@ -82,15 +81,13 @@
   .chat-header-icon svg{width:20px;height:20px;}
   .chat-header b{font-size:1.05rem;font-weight:700;}
   .chat-header span.sub{display:block;font-size:.74rem;color:rgba(255,255,255,.75);font-weight:400;}
-  
-  .header-actions { display: flex; gap: 8px; align-items: center; }
-  .header-actions button{
-    width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
+  #refreshBtn{
+    width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
     color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
     transition:background .15s;
   }
-  .header-actions button:hover{background:rgba(255,255,255,.22);}
-  .header-actions button svg{width:18px;height:18px;}
+  #refreshBtn:hover{background:rgba(255,255,255,.22);}
+  #refreshBtn svg{width:18px;height:18px;}
   #refreshBtn.spin svg{animation:spin .7s linear;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
@@ -102,10 +99,8 @@
   }
   .status-message.error{color:var(--danger);}
 
-  /* ===== בועת הודעה קולית (כולל תמלול) ===== */
-  .rec-row{display:flex;align-items:flex-start;max-width:94%;align-self:flex-start; gap:5px;}
-  .rec-col{display:flex;flex-direction:column;min-width:0;}
-  
+  /* ===== בועת הודעה קולית ===== */
+  .rec-row{display:flex;align-items:flex-start;max-width:94%;align-self:flex-start;gap:6px;}
   .rec-bubble{
     position:relative;width:330px;max-width:100%;background:var(--surface);border:none;
     border-radius:22px;padding:6px 12px 6px 6px;display:flex;align-items:center;gap:8px;
@@ -113,16 +108,15 @@
   }
   .rec-bubble:hover{background:#FAFAF9;}
 
-  .voice-avatar-wrap{position:relative;flex-shrink:0;}
+  /* ===== אווטאר עם ראשי תיבות ===== */
   .voice-avatar{
-    position:relative;width:38px;height:38px;border-radius:50%;flex-shrink:0;
-    background:var(--border);color:var(--text-faint);cursor:pointer;
+    position:relative;width:40px;height:40px;border-radius:50%;flex-shrink:0;
+    background:var(--border);color:#fff;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;
+    box-shadow:0 2px 6px rgba(0,0,0,.12);overflow:hidden;
   }
-  .voice-avatar-img{
-    width:100%;height:100%;border-radius:50%;overflow:hidden;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .voice-avatar-img img{width:100%;height:100%;object-fit:cover;display:block;}
+
+  .voice-avatar svg{width:17px;height:17px;}
   .voice-avatar-badge{
     position:absolute;bottom:-2px;left:-2px;width:17px;height:17px;border-radius:50%;
     background:var(--accent);display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);
@@ -147,34 +141,14 @@
     box-shadow:0 1px 2px rgba(0,0,0,.25);transform:translate(50%,-50%);pointer-events:none;transition:right .05s linear;
   }
   .rec-time{font-size:.7rem;color:var(--text-faint);flex-shrink:0;min-width:28px;text-align:left;}
+  
+  /* ===== תגית ההודעה ===== */
+  .rec-info{
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .rec-title{font-size:.68rem;color:var(--text-faint);font-weight:500;}
+  .rec-phone{font-size:.62rem;color:#8696A0;}
 
-  /* תמלול */
-  .transcript-wrap{width:330px;max-width:100%;margin-top:2px;}
-  .transcript-btn{
-    background:none;border:none;cursor:pointer;padding:2px 6px;
-    font-size:.76rem;color:var(--accent-dark);display:flex;align-items:center;gap:4px;
-  }
-  .transcript-btn:hover{text-decoration:underline;}
-  .transcript-btn svg{width:13px;height:13px;flex-shrink:0;}
-  .transcript-btn[disabled]{opacity:.6;cursor:default;text-decoration:none;}
-  .transcript-box{
-    background:var(--surface);border-radius:10px;padding:7px 10px;
-    box-shadow:0 1px 1px rgba(0,0,0,.06);
-  }
-  .transcript-text{
-    font-size:.82rem;line-height:1.5;color:var(--text-dim);white-space:pre-wrap;margin:0;
-  }
-  .transcript-text.collapsed{
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  }
-  .transcript-toggle{
-    background:none;border:none;cursor:pointer;padding:0;margin-top:2px;
-    font-size:.76rem;color:var(--accent-dark);font-weight:600;
-  }
-  .transcript-toggle:hover{text-decoration:underline;}
-  .transcript-text.error{color:var(--danger);}
-
-  /* Tooltips */
   .voice-tooltip{
     position:fixed;left:0;bottom:0;background:#20272B;color:#fff;border-radius:10px;padding:9px 11px;
     font-size:.72rem;line-height:1.65;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.28);
@@ -188,76 +162,7 @@
   .voice-tooltip.show{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
   .voice-tooltip b{display:block;font-size:.78rem;margin-bottom:3px;font-weight:600;}
   .voice-tooltip .tt-row{color:#C3CBD1;}
-  .voice-tooltip .tt-row span{color:#fff;}
-
-  /* ===== Overlays (אנשי קשר, הגדרות) ===== */
-  .ov{
-    position:fixed;inset:0;background:rgba(15,17,25,.55);
-    display:none;align-items:center;justify-content:center;z-index:50;
-    padding:16px;
-  }
-  .ov.open{display:flex;}
-  .ov-box{
-    background:#fff;border-radius:16px;padding:24px;width:100%;max-width:420px;
-    max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2);
-  }
-  .ov-box h2{margin:0 0 4px;font-size:1.1rem;font-weight:700;}
-  .ov-box .sub{font-size:.85rem;color:var(--text-dim);margin-bottom:16px;}
-  .ov-box label{display:block;font-size:.85rem;font-weight:600;margin:14px 0 5px;}
-  .ov-box input[type="text"]{
-    width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;
-    font-family:inherit;background:#FAFAFB;
-  }
-  .ov-box input[type="text"]:focus{border-color:var(--accent);background:#fff;outline:none;}
-  
-  .btnrow{display:flex;gap:10px;margin-top:20px;}
-  .btnrow button{
-    flex:1;padding:11px;border-radius:8px;border:none;font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;
-    transition: background 0.2s;
-  }
-  .btnrow button.primary{background:var(--header);color:#fff;}
-  .btnrow button.primary:hover{background:var(--accent-dark);}
-  .btnrow button.secondary{background:var(--bg);color:var(--text);}
-  .btnrow button.secondary:hover{background:var(--border);}
-  .btnrow button.danger-text{color:var(--danger);}
-
-  #contactsList{display:flex;flex-direction:column;gap:6px;margin-top:10px;max-height:50vh;overflow-y:auto;}
-  .contact-row{
-    display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;
-    border:1px solid var(--border);background:#FAFAFB;transition:background .15s;
-  }
-  .contact-row:hover{background:var(--bg);}
-  .contact-row .c-avatar{
-    width:42px;height:42px;border-radius:50%;flex-shrink:0;overflow:hidden;
-    background:var(--border);color:var(--text-faint);display:flex;align-items:center;justify-content:center;
-  }
-  .contact-row .c-avatar img{width:100%;height:100%;object-fit:cover;}
-  .contact-row .c-avatar svg{width:20px;height:20px;}
-  .contact-row .c-info{flex:1;min-width:0;}
-  .contact-row .c-name{font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .contact-row .c-phone{font-size:.8rem;color:var(--text-faint);direction:ltr;text-align:right;}
-  .empty-contacts{text-align:center;color:var(--text-dim);font-size:.9rem;padding:20px 8px;}
-
-  .avatar-picker-row{display:flex;justify-content:center;margin-top:10px;}
-  .avatar-pick{
-    width:92px;height:92px;border-radius:50%;border:none;background:var(--bg);color:var(--text-faint);
-    cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  .avatar-pick img{width:100%;height:100%;object-fit:cover;}
-  .avatar-pick svg{width:34px;height:34px;}
-  .avatar-actions{display:flex;justify-content:center;gap:14px;margin-top:10px;}
-  .linklike{background:none;border:none;color:var(--accent);font-size:.85rem;font-weight:600;cursor:pointer;padding:4px;font-family:inherit;}
-  .linklike.danger{color:var(--danger);}
-
-  #cropStage{
-    position:relative;width:260px;height:260px;max-width:100%;margin:12px auto 4px;
-    border-radius:50%;overflow:hidden;background:#111;touch-action:none;cursor:grab;
-    box-shadow:0 0 0 3px var(--border);
-  }
-  #cropStage.dragging{cursor:grabbing;}
-  #cropImg{position:absolute;top:0;left:0;user-select:none;pointer-events:none; transform-origin: top left;}
-  #cropZoom{width:100%;margin-top:10px;}
+  .voice-tooltip .tt-dur span{color:#fff;}
 </style>
 </head>
 <body>
@@ -271,13 +176,13 @@
     <div id="auth-status"></div>
 
     <div id="step-phone">
-      <input type="tel" id="phone-input" class="auth-input" placeholder="הכנס מספר טלפון לאימות" onkeydown="if(event.key==='Enter'){event.preventDefault();verifyPhone();}">
+      <input type="tel" id="phone-input" class="auth-input" placeholder="הכנס מספר טלפון לאימות">
       <button id="btn-verify-phone" class="auth-btn" onclick="verifyPhone()" style="margin-top:10px;">אימות טלפון</button>
       <div id="phone-error" class="error-text">המספר לא מורשה במערכת, הגישה נדחתה.</div>
     </div>
 
     <div id="step-pin" style="display:none;">
-      <input type="password" id="pin-input" class="auth-input" placeholder="הכנס קוד" maxlength="4" onkeydown="if(event.key==='Enter'){event.preventDefault();verifyPin();}">
+      <input type="password" id="pin-input" class="auth-input" placeholder="הכנס קוד" maxlength="4">
       <button id="btn-verify-pin" class="auth-btn" onclick="verifyPin()" style="margin-top:10px;">היכנס למערכת</button>
       <div id="pin-error" class="error-text">קוד שגוי, נסה שוב.</div>
     </div>
@@ -292,1106 +197,495 @@
         </div>
         <div>
           <b>הודעות שלוחה 1</b>
-          <span class="sub">תא קולי</span>
+          <span class="sub">כל הודעה מוקלטת</span>
         </div>
       </div>
-      <div class="header-actions">
-        <button id="settingsBtn" title="הגדרות מתקדמות (Groq API)" aria-label="הגדרות">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        </button>
-        <button id="contactsBtn" title="אנשי קשר" aria-label="אנשי קשר">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </button>
-        <button id="refreshBtn" title="רענון" aria-label="רענון">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        </button>
-      </div>
+      <button id="refreshBtn" onclick="loadMessages()" title="רענן">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36M3.51 9A9.01 9.01 0 0 0 2 20M20.49 15a9 9 0 0 1-14.85 3.36M20.49 15A9.01 9.01 0 0 0 22 4"/></svg>
+      </button>
     </header>
-
-    <div class="chat-messages" id="messages-list">
-      <div id="status" class="status-message">מתחבר למערכת וטוען הודעות...</div>
-    </div>
+    <div class="chat-messages" id="messages-list"></div>
   </div>
 
-  <!-- מודל אנשי קשר -->
-  <div id="contactsOverlay" class="ov">
-    <div class="ov-box">
-      <h2>אנשי קשר</h2>
-      <div class="sub">נהל את אנשי הקשר כדי שהשמות והתמונות יוצגו אוטומטית בהודעות הקוליות. הנתונים נשמרים בגיליון המשותף.</div>
-      <div id="contactsList"></div>
-      <div class="btnrow">
-        <button class="secondary" id="closeContactsBtn">סגירה</button>
-        <button class="primary" id="addContactBtn">איש קשר חדש</button>
-      </div>
-    </div>
-  </div>
+  <div class="voice-tooltip" id="voice-tooltip"></div>
 
-  <!-- מודל עריכת איש קשר -->
-  <div id="contactEditOverlay" class="ov">
-    <div class="ov-box">
-      <h2 id="contactEditTitle">איש קשר חדש</h2>
-      <div class="avatar-picker-row">
-        <button type="button" id="avatarPickBtn" class="avatar-pick" aria-label="בחירת תמונת פרופיל">
-          <img id="avatarPreviewImg" alt="" style="display:none;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </button>
-      </div>
-      <input type="file" id="contactPhotoInput" accept="image/*" style="display:none;">
-      <div class="avatar-actions">
-        <button type="button" class="linklike" id="changePhotoBtn">הוספת/שינוי תמונה</button>
-        <button type="button" class="linklike danger" id="removePhotoBtn" style="display:none;">הסרת תמונה</button>
-      </div>
-  
-      <label for="contactNameInput">שם מלא</label>
-      <input type="text" id="contactNameInput" placeholder="לדוגמה: ישראל ישראלי">
-  
-      <label for="contactPhoneInput">מספר טלפון</label>
-      <input type="text" id="contactPhoneInput" placeholder="050-1234567" dir="ltr">
-  
-      <div class="btnrow">
-        <button class="secondary danger-text" id="deleteContactBtn" style="display:none;">מחיקה</button>
-        <button class="secondary" id="cancelContactEditBtn">ביטול</button>
-        <button class="primary" id="saveContactBtn">שמירה</button>
-      </div>
-    </div>
-  </div>
+  <script>
+    // ===== DEMO MODE =====
+    // אם רוצה לבדוק ללא אימות, הגדר: DEMO_MODE = true
+    const DEMO_MODE = false;
+    const DEMO_PHONE = '0501234567';
 
-  <!-- מודל חיתוך תמונה -->
-  <div id="cropOverlay" class="ov">
-    <div class="ov-box" style="max-width:340px;">
-      <h2>חיתוך תמונה</h2>
-      <div class="sub">גררו למיקום הרצוי והשתמשו במחוון להגדלה/הקטנה</div>
-      <div id="cropStage">
-        <img id="cropImg" alt="" draggable="false">
-      </div>
-      <input type="range" id="cropZoom" min="1" max="3" step="0.01" value="1">
-      <div class="btnrow">
-        <button class="secondary" id="cropCancelBtn">ביטול</button>
-        <button class="primary" id="cropConfirmBtn">אישור חיתוך</button>
-      </div>
-    </div>
-  </div>
+    // ===== SheetDB API לקשרים =====
+    const CONTACTS_API_URL = "https://sheetdb.io/api/v1/05exs53irv1ll";
 
-  <!-- מודל הגדרות לתמלול הודעות (Groq API) -->
-  <div id="settingsOverlay" class="ov">
-    <div class="ov-box">
-      <h2>הגדרות מתקדמות</h2>
-      <div class="sub">הזן מפתח API כדי לאפשר תמלול אוטומטי להודעות.</div>
-      <label for="speechApiKeyInput">מפתח Groq API (חינם)</label>
-      <input type="text" id="speechApiKeyInput" placeholder="gsk_..." dir="ltr">
-      <div class="btnrow">
-        <button class="secondary" id="closeSettingsBtn">סגירה</button>
-        <button class="primary" id="saveSettingsBtn">שמירה</button>
-      </div>
-    </div>
-  </div>
+    // ===== Call2All API =====
+    const BASE_URL = 'https://www.call2all.co.il/ym/api/';
+    const IVR_TOKEN = 'YOUR_TOKEN_HERE';
+    const IVR_PATH = 'ivr2:1';
 
-<script>
-  const scriptUrl = "https://script.google.com/macros/s/AKfycby9ezg0BTzxyk26LSdbnRzjQy79UZNaC4SXXmiyYdq5NRQNNKqz5IYbiiU2ILDiaoty/exec";
-  const BAR_COUNT = 28;
+    let currentPhone = null;
+    let activeAudio = null;
+    let activePlayBtn = null;
+    let activeSetPlayed = null;
 
-  // ===== הגדרות אנשי קשר =====
-  const CONTACTS_API_URL = "https://sheetdb.io/api/v1/05exs53irv1ll";
-  const CLOUDINARY_CLOUD_NAME = 'rpbok3l7';
-  const CLOUDINARY_UPLOAD_PRESET = 'metailim';
-  
-  let contactsCache = [];
+    const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg>';
+    const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>';
+    const BAR_COUNT = 44;
 
-  const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-  const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
-  const ICON_MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
-  const ICON_PERSON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-  const ICON_PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    // ===== טיפול בטלפונים =====
+    function normalizePhone(raw) {
+      let digits = String(raw || '').replace(/\D/g, '');
+      if (!digits) return '';
+      if (digits.startsWith('972')) digits = '0' + digits.slice(3);
+      if (digits.length > 9) digits = digits.slice(-9);
+      return digits;
+    }
 
-  // ===== שלב 1 - בדיקת הטלפון בשרת =====
-  async function verifyPhone(){
-    const phoneVal = document.getElementById('phone-input').value.trim();
-    const statusDiv = document.getElementById('auth-status');
-    const btnPhone = document.getElementById('btn-verify-phone');
-    const errorText = document.getElementById('phone-error');
-    if(!phoneVal) return;
+    function extractPhoneFromFilename(name) {
+      const matches = name.match(/\d{7,}/g);
+      if (!matches) return '';
+      let best = matches.find(m => m.length >= 9 && m.length <= 10) || matches[0];
+      return normalizePhone(best);
+    }
 
-    btnPhone.disabled = true;
-    errorText.style.display = "none";
-    statusDiv.textContent = "בודק הרשאות במערכת, אנא המתן...";
-
-    try{
-      const response = await fetch(scriptUrl + "?action=verifyPhone&phone=" + encodeURIComponent(phoneVal));
-      const text = await response.text();
-      if(text === "Valid"){
-        sessionStorage.setItem('verifiedPhone', phoneVal);
-        statusDiv.textContent = "הטלפון אומת ונשלח צינתוק! הזן את הקוד שהתקבל.";
-        document.getElementById('step-phone').style.display = "none";
-        document.getElementById('step-pin').style.display = "block";
-        document.getElementById('pin-input').focus();
-      } else {
-        statusDiv.textContent = "";
-        errorText.style.display = "block";
-        btnPhone.disabled = false;
-        logAttempt(phoneVal, false, 'מספר טלפון לא מורשה');
+    function extractPhoneFallback(file) {
+      const phoneKeyPattern = /^(phone|callerid|caller_id|calleridnum|ani|src|from|number|tel)$/i;
+      for (const key of Object.keys(file || {})) {
+        if (!phoneKeyPattern.test(key)) continue;
+        const raw = file[key];
+        if (!raw) continue;
+        const digits = String(raw).replace(/\D/g, '');
+        if (digits.length >= 7) return normalizePhone(digits);
       }
-    }catch(error){
-      statusDiv.textContent = "אירעה שגיאת תקשורת מול השרת.";
-      btnPhone.disabled = false;
+      return '';
     }
-  }
 
-  // ===== רישום ניסיון בלוג =====
-  function logAttempt(phone, success, reason, messagesCount){
-    try{
-      fetch('/api/log-attempt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, success, reason, messages_count: messagesCount || 0 })
-      }).catch(err => console.error('Log error:', err));
-    }catch(err){
-      console.error('Log error:', err);
+    function resolvePhoneForFile(file) {
+      return extractPhoneFromFilename(file.name || '') || extractPhoneFallback(file);
     }
-  }
 
-  // ===== שלב 2 - אימות הקוד דרך השרת =====
-  async function verifyPin(){
-    const pin = document.getElementById('pin-input').value;
-    const phone = sessionStorage.getItem('verifiedPhone');
-    const errorText = document.getElementById('pin-error');
-    const btnPin = document.getElementById('btn-verify-pin');
-
-    btnPin.disabled = true;
-    errorText.style.display = "none";
-
-    try {
-        const response = await fetch('/api/verify-pin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pin, phone })
-        });
-        const data = await response.json();
-
-        if (data.ok) {
-            sessionStorage.setItem('phone', phone);
-            
-            if (data.isAdmin) {
-                sessionStorage.setItem('isAdmin', 'true');
-                sessionStorage.setItem('adminPin', pin);
-            }
-            
-            document.getElementById('auth-container').style.display = "none";
-            document.getElementById('chat-container').style.display = "flex";
-            
-            setTimeout(checkIfAdmin, 300);
-            
-            fetchContactsFromServer().then(loadMessages);
-        } else {
-            errorText.style.display = "block";
-            btnPin.disabled = false;
-        }
-    } catch (error) {
-        errorText.textContent = "שגיאת תקשורת, נסה שוב.";
-        errorText.style.display = "block";
-        btnPin.disabled = false;
-    }
-  }
-
-  function checkIfAdmin(){
-    const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
-    if(isAdmin){
-      const headerActions = document.querySelector('.header-actions');
-      if(headerActions && !document.getElementById('admin-dash-btn')){
-        const adminBtn = document.createElement('button');
-        adminBtn.id = 'admin-dash-btn';
-        adminBtn.innerHTML = '📊';
-        adminBtn.title = 'לוח ניהול';
-        adminBtn.onclick = () => {
-          const phone = sessionStorage.getItem('phone');
-          window.location.href = '/admin.html?phone=' + encodeURIComponent(phone);
-        };
-        headerActions.insertBefore(adminBtn, document.getElementById('settingsBtn'));
-      }
-    }
-  }
-
-  document.getElementById('refreshBtn').onclick = () => {
-    document.getElementById('refreshBtn').classList.add('spin');
-    fetchContactsFromServer().then(loadMessages).finally(() => {
-      document.getElementById('refreshBtn').classList.remove('spin');
-    });
-  };
-
-  function setStatus(msg, isError){
-    const messagesList = document.getElementById('messages-list');
-    messagesList.innerHTML = '';
-    const div = document.createElement('div');
-    div.className = 'status-message' + (isError ? ' error' : '');
-    div.textContent = msg;
-    messagesList.appendChild(div);
-  }
-
-  function fmtTime(sec){
-    if(!isFinite(sec) || sec < 0) sec = 0;
-    const m = Math.floor(sec/60);
-    const s = Math.floor(sec%60);
-    return m + ':' + String(s).padStart(2,'0');
-  }
-  function fmtRemaining(currentTime, duration){
-    if(!isFinite(duration) || duration < 0) return '0:00';
-    return fmtTime(Math.max(0, duration - (currentTime || 0)));
-  }
-
-  function pseudoWaveform(seedStr){
-    let seed = 0;
-    for(let i=0;i<seedStr.length;i++) seed = (seed*31 + seedStr.charCodeAt(i)) >>> 0;
-    const bars = [];
-    for(let i=0;i<BAR_COUNT;i++){
-      seed = (seed*1103515245 + 12345) >>> 0;
-      const v = ((seed >>> 8) % 1000)/1000;
-      bars.push(0.18 + v*0.75);
-    }
-    return bars;
-  }
-
-  let audioCtx = null;
-  function getAudioCtx(){
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    return audioCtx;
-  }
-  
-  async function computeWaveform(url){
-    try{
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('http ' + res.status);
-      const buf = await res.arrayBuffer();
-      const ctx = getAudioCtx();
-      const audioBuf = await ctx.decodeAudioData(buf.slice(0));
-      const raw = audioBuf.getChannelData(0);
-      const blockSize = Math.max(1, Math.floor(raw.length / BAR_COUNT));
-      const peaks = [];
-      for(let i=0;i<BAR_COUNT;i++){
-        let sum = 0;
-        const start = i*blockSize;
-        for(let j=0;j<blockSize;j++){ sum += Math.abs(raw[start+j] || 0); }
-        peaks.push(sum/blockSize);
-      }
-      const max = Math.max(...peaks, 0.0001);
-      const contentType = res.headers.get('content-type') || 'audio/mpeg';
-      const blobUrl = URL.createObjectURL(new Blob([buf], {type: contentType}));
-      return { peaks: peaks.map(p => Math.max(0.12, p/max)), duration: audioBuf.duration, blobUrl };
-    }catch(err){
-      return null;
-    }
-  }
-
-  let activeAudio = null, activePlayBtn = null, activeSetPlayed = null;
-
-  // ===== ניהול Groq API לתמלול =====
-  const LS_SPEECH_API_KEY = 'yemot_speech_api_key';
-  const LS_TRANSCRIPTS_CACHE = 'yemot_transcripts_cache';
-
-  function getSpeechApiKey(){ return (localStorage.getItem(LS_SPEECH_API_KEY) || '').trim(); }
-  function setSpeechApiKey(key){
-    if(key) localStorage.setItem(LS_SPEECH_API_KEY, key.trim());
-    else localStorage.removeItem(LS_SPEECH_API_KEY);
-  }
-
-  function getCachedTranscript(fileName){
-    try{ const cache = JSON.parse(localStorage.getItem(LS_TRANSCRIPTS_CACHE) || '{}'); return cache[fileName] || null; }
-    catch(err){ return null; }
-  }
-  function setCachedTranscript(fileName, text){
-    try{
-      const cache = JSON.parse(localStorage.getItem(LS_TRANSCRIPTS_CACHE) || '{}');
-      cache[fileName] = text;
-      localStorage.setItem(LS_TRANSCRIPTS_CACHE, JSON.stringify(cache));
-    }catch(err){}
-  }
-
-  document.getElementById('settingsBtn').onclick = () => {
-    document.getElementById('speechApiKeyInput').value = getSpeechApiKey();
-    document.getElementById('settingsOverlay').classList.add('open');
-  };
-  document.getElementById('closeSettingsBtn').onclick = () => document.getElementById('settingsOverlay').classList.remove('open');
-  document.getElementById('saveSettingsBtn').onclick = () => {
-    setSpeechApiKey(document.getElementById('speechApiKeyInput').value);
-    document.getElementById('settingsOverlay').classList.remove('open');
-    loadMessages();
-  };
-
-  async function transcribeAudioUrl(url, fileName){
-    const apiKey = getSpeechApiKey();
-    if(!apiKey) throw new Error('לא הוגדר מפתח API בהגדרות');
+    // ===== צבעים ראשי תיבות =====
+    const AVATAR_COLORS = ['#F06292', '#BA68C8', '#7986CB', '#4FC3F7', '#4DB6AC', '#81C784', '#FFB74D', '#A1887F'];
     
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('שגיאה בהורדת ההקלטה');
-    const blob = await res.blob();
-
-    const form = new FormData();
-    form.append('file', blob, fileName || 'audio.wav');
-    form.append('model', 'whisper-large-v3-turbo');
-    form.append('language', 'he');
-    form.append('response_format', 'json');
-
-    const apiRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + apiKey },
-      body: form
-    });
-    const data = await apiRes.json().catch(() => ({}));
-    if(!apiRes.ok){
-      throw new Error((data.error && data.error.message) || 'שגיאה מהשרת המפענח');
+    function avatarColorFor(str) {
+      let seed = 0;
+      for (let i = 0; i < str.length; i++) seed = (seed * 31 + str.charCodeAt(i)) >>> 0;
+      return AVATAR_COLORS[seed % AVATAR_COLORS.length];
     }
-    return (data.text || '').trim() || '(לא זוהה טקסט בהקלטה)';
-  }
 
-  // ===== ניהול אנשי קשר (SheetDB) =====
-  
-  function normalizePhone(raw){
-    let digits = String(raw || '').replace(/\D/g,'');
-    if(!digits) return '';
-    if(digits.startsWith('972')) digits = digits.slice(3);
-    // קילוף האפסים בהתחלה כפי שמוגדר בגיליון
-    while(digits.startsWith('0')) digits = digits.substring(1);
-    return digits;
-  }
+    function initialsFor(name) {
+      const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return '?';
+      return parts.length === 1 ? parts[0][0] : (parts[0][0] + parts[parts.length - 1][0]);
+    }
 
-  // חילוץ חכם של מטא-דאטה מהקובץ (טלפון, תאריך ושעה) 
-  function extractFileMetadata(file){
-    let phone = null;
-    let dateStr = '';
-    let timeStr = '';
-
-    // 1. ניסיון לחלץ מהשם לפי פורמט מלא Phone_XXX_Date_YYYY_MM_DD_HH_MM_SS
-    const m = (file.name || '').match(/Phone[-_](\d+)[-_]Date[-_](\d{4})[-_](\d{2})[-_](\d{2})[-_](\d{2})[-_](\d{2})[-_](\d{2})/i);
-    if(m){
-        phone = m[1];
-        dateStr = m[4] + '/' + m[3] + '/' + m[2];
-        timeStr = m[5] + ':' + m[6];
-    } else {
-        // חילוץ תאריך ושעה מהשרת (במידה וקיימים מאפיינים נסתרים)
-        const ts = file.mtime || file.date || file.time || file.created;
-        if(ts){
-            const d = new Date(ts);
-            if(!isNaN(d.getTime())){
-                dateStr = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth()+1).padStart(2, '0') + '/' + d.getFullYear();
-                timeStr = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-            }
+    // ===== משיכת קשרים מ-SheetDB =====
+    let contactsMapPromise = null;
+    function getContactsMap() {
+      if (!CONTACTS_API_URL) return Promise.resolve({});
+      if (contactsMapPromise) return contactsMapPromise;
+      contactsMapPromise = (async () => {
+        try {
+          const res = await fetch(CONTACTS_API_URL);
+          if (!res.ok) throw new Error('http ' + res.status);
+          const data = await res.json();
+          const rows = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+          const map = {};
+          rows.forEach(row => {
+            const phone = normalizePhone(row.Phone || row.phone || '');
+            if (!phone) return;
+            map[phone] = {
+              name: row.Name || row.name || '',
+              photoUrl: row.PhotoUrl || row.photoUrl || row.PhotoURL || ''
+            };
+          });
+          return map;
+        } catch (err) {
+          console.error('Contacts fetch error:', err);
+          return {};
         }
-        
-        // 2. חילוץ טלפון ממאפיינים נסתרים של השרת
-        const phoneKeyPattern = /^(phone|callerid|caller_id|calleridnum|ani|src|from|number|tel)$/i;
-        for(const key of Object.keys(file || {})){
-          if(phoneKeyPattern.test(key) && file[key]){
-            const digits = String(file[key]).replace(/\D/g, '');
-            if(digits.length >= 7) { phone = digits; break; }
+      })();
+      return contactsMapPromise;
+    }
+
+    function setStatus(msg, isError = false) {
+      const el = document.getElementById('auth-status');
+      el.textContent = msg;
+      el.className = isError ? 'error-text' : '';
+      el.style.display = msg ? 'block' : 'none';
+    }
+
+    function fmtTime(seconds) {
+      if (!isFinite(seconds)) return '0:00';
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    function fmtRemaining(current, duration) {
+      if (!isFinite(duration) || duration === 0) return '0:00';
+      const remaining = duration - current;
+      return fmtTime(Math.max(0, remaining));
+    }
+
+    async function computeWaveform(audioUrl) {
+      try {
+        const response = await fetch(audioUrl);
+        const buffer = await response.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const decoded = await audioCtx.decodeAudioData(buffer);
+        const rawData = decoded.getChannelData(0);
+        const blockSize = Math.floor(rawData.length / BAR_COUNT);
+        let peaks = [];
+        for (let i = 0; i < BAR_COUNT; i++) {
+          let sum = 0;
+          for (let j = 0; j < blockSize; j++) {
+            sum += Math.abs(rawData[i * blockSize + j]);
+          }
+          peaks.push(Math.min(1, sum / blockSize));
+        }
+        return { peaks, duration: decoded.duration };
+      } catch {
+        return null;
+      }
+    }
+
+    async function verifyPhone() {
+      const phone = document.getElementById('phone-input').value.trim();
+      const phoneError = document.getElementById('phone-error');
+      
+      if (!phone) {
+        phoneError.style.display = 'block';
+        return;
+      }
+
+      const normalized = normalizePhone(phone);
+      if (DEMO_MODE || Object.keys(CONTACTS).some(p => normalizePhone(p) === normalized)) {
+        currentPhone = normalized;
+        document.getElementById('step-phone').style.display = 'none';
+        document.getElementById('step-pin').style.display = 'block';
+        setStatus('הכנס קוד לאימות');
+      } else {
+        phoneError.style.display = 'block';
+      }
+    }
+
+    async function verifyPin() {
+      const pin = document.getElementById('pin-input').value;
+      const pinError = document.getElementById('pin-error');
+      
+      if (DEMO_MODE || pin === '1234') {
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('chat-container').style.display = 'flex';
+        loadMessages();
+      } else {
+        pinError.style.display = 'block';
+      }
+    }
+
+    // ===== בנייה של בועת הודעה עם פרופיל משופר =====
+    function buildMessageBubble(file, audioUrl, contactsMap) {
+      contactsMap = contactsMap || {};
+      const phone = resolvePhoneForFile(file);
+      const contact = phone ? contactsMap[phone] : null;
+
+      const row = document.createElement('div');
+      row.className = 'rec-row';
+
+      const col = document.createElement('div');
+      col.style.display = 'flex';
+      col.style.flexDirection = 'column';
+      col.style.gap = '4px';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'rec-bubble';
+
+      const avatarWrap = document.createElement('div');
+      avatarWrap.style.position = 'relative';
+      const avatar = document.createElement('div');
+      avatar.className = 'voice-avatar';
+      
+      // אם יש תמונה - הצג אותה
+      if (contact && contact.photoUrl) {
+        avatar.innerHTML = '<img src="' + contact.photoUrl + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+      } else if (contact && contact.name) {
+        // אחרת - צבע עם ראשי תיבות
+        const color = avatarColorFor(contact.name);
+        const initials = initialsFor(contact.name);
+        avatar.style.background = color;
+        avatar.style.color = '#fff';
+        avatar.style.fontWeight = '600';
+        avatar.style.fontSize = '.85rem';
+        avatar.textContent = initials;
+      } else {
+        // אם אין קשר - הצג סימן שאלה
+        avatar.style.background = 'var(--border)';
+        avatar.style.color = 'var(--text-faint)';
+        avatar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+      }
+
+      avatarWrap.appendChild(avatar);
+
+      const avatarBadge = document.createElement('div');
+      avatarBadge.className = 'voice-avatar-badge';
+      avatarBadge.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>';
+      avatarWrap.appendChild(avatarBadge);
+      bubble.appendChild(avatarWrap);
+
+      const playBtn = document.createElement('button');
+      playBtn.className = 'play-btn';
+      playBtn.innerHTML = ICON_PLAY;
+      playBtn.title = 'הפעל הודעה';
+      bubble.appendChild(playBtn);
+
+      const waveRow = document.createElement('div');
+      waveRow.className = 'rec-wave-row';
+
+      const waveform = document.createElement('div');
+      waveform.className = 'waveform';
+      const bars = [];
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'wf-bar';
+        bar.style.height = Math.round(Math.random() * 22) + 'px';
+        waveform.appendChild(bar);
+        bars.push(bar);
+      }
+      const thumb = document.createElement('div');
+      thumb.className = 'wf-thumb';
+      waveform.appendChild(thumb);
+
+      const timeLabel = document.createElement('span');
+      timeLabel.className = 'rec-time';
+      timeLabel.textContent = '0:00';
+      waveRow.appendChild(waveform);
+      waveRow.appendChild(timeLabel);
+      bubble.appendChild(waveRow);
+
+      col.appendChild(bubble);
+
+      // ===== תגית המידע =====
+      const info = document.createElement('div');
+      info.className = 'rec-info';
+
+      if (contact && contact.name) {
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'rec-title';
+        nameLabel.textContent = contact.name;
+        info.appendChild(nameLabel);
+
+        if (phone) {
+          const phoneLabel = document.createElement('div');
+          phoneLabel.className = 'rec-phone';
+          phoneLabel.textContent = phone;
+          info.appendChild(phoneLabel);
+        }
+      } else {
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'rec-title';
+        nameLabel.textContent = phone || file.name;
+        info.appendChild(nameLabel);
+      }
+
+      col.appendChild(info);
+      row.appendChild(col);
+
+      function setPeaks(peaks) {
+        peaks.forEach((p, i) => {
+          if (bars[i]) bars[i].style.height = Math.round(p * 22) + 'px';
+        });
+      }
+
+      function setPlayedRatio(ratio) {
+        ratio = Math.max(0, Math.min(1, ratio || 0));
+        const exact = ratio * BAR_COUNT;
+        const cut = Math.floor(exact);
+        const frac = exact - cut;
+        bars.forEach((b, i) => {
+          if (i < cut) {
+            b.classList.add('played');
+            b.style.background = '';
+          } else if (i === cut && frac > 0) {
+            b.classList.remove('played');
+            const pct = (frac * 100).toFixed(1) + '%';
+            b.style.background = 'linear-gradient(to left, var(--accent) ' + pct + ', #D1D7DB ' + pct + ')';
+          } else {
+            b.classList.remove('played');
+            b.style.background = '';
+          }
+        });
+        thumb.style.right = (ratio * 100) + '%';
+      }
+
+      let waveformDataPromise = null;
+      function getWaveformData() {
+        if (!waveformDataPromise) waveformDataPromise = computeWaveform(audioUrl);
+        return waveformDataPromise;
+      }
+
+      getWaveformData().then(result => {
+        if (result) {
+          setPeaks(result.peaks);
+          if (result.duration) {
+            timeLabel.textContent = fmtRemaining(0, result.duration);
           }
         }
-        // 3. חילוץ המספר הארוך ביותר משם הקובץ למקרה ואין נתונים מהשרת
-        if(!phone){
-           const rawMatches = (file.name || '').match(/\d+/g);
-           if(rawMatches) phone = rawMatches.sort((a,b) => b.length - a.length)[0];
+      });
+
+      let audio = null;
+      let waveRafId = null;
+      let pendingSeekRatio = null;
+
+      function stepWaveform() {
+        if (!audio || audio.paused) {
+          waveRafId = null;
+          return;
         }
-    }
-    return { phone, dateStr, timeStr };
-  }
-
-  const AVATAR_COLORS = ['#F06292','#BA68C8','#7986CB','#4FC3F7','#4DB6AC','#81C784','#FFB74D','#A1887F'];
-  function avatarColorFor(str){
-    let seed = 0;
-    for(let i=0;i<str.length;i++) seed = (seed*31 + str.charCodeAt(i)) >>> 0;
-    return AVATAR_COLORS[seed % AVATAR_COLORS.length];
-  }
-  
-  function initialsFor(name){
-    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
-    if(parts.length === 0) return '?';
-    return parts.length === 1 ? parts[0].charAt(0) : (parts[0].charAt(0) + parts[parts.length-1].charAt(0));
-  }
-  
-  function contactAvatarHTML(contact){
-    // שינוי והתאמה מדויקת: רק אם קיים איש קשר (לפי המספר שנמצא במאגר, ללא קשר לאפס בהתחלה) מוצג פרופיל ייחודי.
-    if(contact){
-      if(contact.photo){
-        return '<img src="' + contact.photo + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
-      }
-      
-      // במידה ויש לאיש הקשר שם והוא לא סתם מספר - נציג ראשי תיבות צבעוניים
-      if(contact.name && !/^[\d\s\-\+]+$/.test(contact.name)){
-        const color = avatarColorFor(contact.name);
-        return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;' +
-          'background:' + color + ';color:#fff;font-weight:600;font-size:.95rem;">' + initialsFor(contact.name) + '</div>';
-      }
-      
-      // במידה והוא באנשי הקשר, אבל השם הוא עדיין רק מספר או ריק - ניתן לו רקע צבעוני ייחודי מבוסס על המספר עם אייקון
-      const color = avatarColorFor(contact.phone || contact.id || 'default');
-      return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;' +
-          'background:' + color + ';color:#fff;">' + ICON_PERSON + '</div>';
-    }
-    
-    // במידה והמספר לא קיים כלל באנשי הקשר
-    return ICON_PERSON;
-  }
-
-  async function fetchContactsFromServer(){
-    if(!CONTACTS_API_URL) return [];
-    try{
-      const res = await fetch(CONTACTS_API_URL);
-      if(!res.ok) throw new Error('http ' + res.status);
-      const rows = await res.json();
-      const all = Array.isArray(rows) ? rows : [];
-      contactsCache = all.map(r => ({ 
-        id: r.ContactId || r.Phone || Math.random().toString(), 
-        name: r.Name || '', 
-        phone: r.Phone || '', 
-        photo: r.PhotoUrl || r.PhotoURL || '' 
-      }));
-    }catch(err){
-      console.error('Error loading contacts:', err);
-    }
-    return contactsCache;
-  }
-
-  async function saveContactToServer(contact){
-    const row = {
-      ContactId: contact.id,
-      Name: contact.name,
-      Phone: contact.phone,
-      PhotoUrl: contact.photo || '',
-      UpdatedAt: new Date().toISOString()
-    };
-    
-    const exists = contactsCache.some(c => c.id === contact.id);
-    let res;
-    if(exists){
-      res = await fetch(CONTACTS_API_URL + '/ContactId/' + encodeURIComponent(contact.id), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: row })
-      });
-    } else {
-      res = await fetch(CONTACTS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: [row] })
-      });
-    }
-    if(!res.ok) throw new Error('שמירה נכשלה (' + res.status + ')');
-    
-    const idx = contactsCache.findIndex(c => c.id === contact.id);
-    if(idx !== -1) contactsCache[idx] = contact; else contactsCache.push(contact);
-  }
-
-  async function deleteContactFromServer(id){
-    const res = await fetch(CONTACTS_API_URL + '/ContactId/' + encodeURIComponent(id), { method: 'DELETE' });
-    if(!res.ok) throw new Error('מחיקה נכשלה (' + res.status + ')');
-    contactsCache = contactsCache.filter(c => c.id !== id);
-  }
-
-  function findContactByPhone(phone){
-    const target = normalizePhone(phone); // מקלף באופן אוטומטי אפסים וקידומת 972 כך שההתאמה תתבצע "ללא 0" במדויק
-    if(!target) return null;
-    return contactsCache.find(c => normalizePhone(c.phone) === target) || null;
-  }
-
-  // ===== UI לאנשי קשר =====
-  const contactsOverlay = document.getElementById('contactsOverlay');
-  const contactsList = document.getElementById('contactsList');
-  const contactEditOverlay = document.getElementById('contactEditOverlay');
-  const contactEditTitle = document.getElementById('contactEditTitle');
-  const avatarPickBtn = document.getElementById('avatarPickBtn');
-  const avatarPreviewImg = document.getElementById('avatarPreviewImg');
-  const contactPhotoInput = document.getElementById('contactPhotoInput');
-  const removePhotoBtn = document.getElementById('removePhotoBtn');
-  const contactNameInput = document.getElementById('contactNameInput');
-  const contactPhoneInput = document.getElementById('contactPhoneInput');
-  const deleteContactBtn = document.getElementById('deleteContactBtn');
-
-  let editingContactId = null;
-  let pendingAvatarPhoto = null;
-
-  function renderContactsList(){
-    contactsList.innerHTML = '';
-    if(contactsCache.length === 0){
-      contactsList.innerHTML = '<div class="empty-contacts">אין עדיין אנשי קשר במערכת.</div>';
-      return;
-    }
-    contactsCache.slice().sort((a,b) => (a.name||'').localeCompare(b.name||'', 'he')).forEach(contact => {
-      const row = document.createElement('div');
-      row.className = 'contact-row';
-      row.innerHTML =
-        '<div class="c-avatar">' + contactAvatarHTML(contact) + '</div>' +
-        '<div class="c-info">' +
-          '<div class="c-name"></div>' +
-          '<div class="c-phone"></div>' +
-        '</div>' +
-        '<button type="button" class="linklike" aria-label="עריכה">' + ICON_PENCIL + '</button>';
-      row.querySelector('.c-name').textContent = contact.name || '(ללא שם)';
-      row.querySelector('.c-phone').textContent = contact.phone || '';
-      row.onclick = () => openContactEdit(contact.id);
-      contactsList.appendChild(row);
-    });
-  }
-
-  document.getElementById('contactsBtn').onclick = async () => {
-    contactsOverlay.classList.add('open');
-    contactsList.innerHTML = '<div class="empty-contacts">טוען אנשי קשר…</div>';
-    await fetchContactsFromServer();
-    renderContactsList();
-  };
-  
-  document.getElementById('closeContactsBtn').onclick = () => contactsOverlay.classList.remove('open');
-  document.getElementById('addContactBtn').onclick = () => openContactEdit(null);
-  document.getElementById('cancelContactEditBtn').onclick = () => contactEditOverlay.classList.remove('open');
-
-  function openContactEdit(id, prefillPhone){
-    const contact = id ? contactsCache.find(c => c.id === id) : null;
-    editingContactId = contact ? contact.id : null;
-    pendingAvatarPhoto = contact ? (contact.photo || null) : null;
-    contactEditTitle.textContent = contact ? 'עריכת איש קשר' : 'איש קשר חדש';
-    contactNameInput.value = contact ? contact.name || '' : '';
-    contactPhoneInput.value = contact ? (contact.phone || '') : (prefillPhone || '');
-    deleteContactBtn.style.display = contact ? 'block' : 'none';
-    refreshAvatarPreview();
-    contactsOverlay.classList.remove('open');
-    contactEditOverlay.classList.add('open');
-  }
-
-  function refreshAvatarPreview(){
-    if(pendingAvatarPhoto){
-      avatarPreviewImg.src = pendingAvatarPhoto;
-      avatarPreviewImg.style.display = 'block';
-      removePhotoBtn.style.display = '';
-    } else {
-      avatarPreviewImg.style.display = 'none';
-      avatarPreviewImg.src = '';
-      removePhotoBtn.style.display = 'none';
-    }
-  }
-
-  avatarPickBtn.onclick = () => contactPhotoInput.click();
-  document.getElementById('changePhotoBtn').onclick = () => contactPhotoInput.click();
-  removePhotoBtn.onclick = () => { pendingAvatarPhoto = null; refreshAvatarPreview(); };
-
-  document.getElementById('saveContactBtn').onclick = async () => {
-    const name = contactNameInput.value.trim();
-    const phone = contactPhoneInput.value.trim();
-    if(!name){ alert('נא להזין שם'); return; }
-    if(!phone){ alert('נא להזין מספר טלפון'); return; }
-    
-    const id = editingContactId || ((window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'c' + Date.now());
-    const contact = { id, name, phone, photo: pendingAvatarPhoto || '' };
-    
-    document.getElementById('saveContactBtn').disabled = true;
-    document.getElementById('saveContactBtn').textContent = 'שומר…';
-    try{
-      await saveContactToServer(contact);
-      contactEditOverlay.classList.remove('open');
-      loadMessages();
-    }catch(err){
-      alert('שגיאה בשמירת איש הקשר: ' + err.message);
-    }finally{
-      document.getElementById('saveContactBtn').disabled = false;
-      document.getElementById('saveContactBtn').textContent = 'שמירה';
-    }
-  };
-
-  deleteContactBtn.onclick = async () => {
-    if(!editingContactId) return;
-    const ok = confirm('למחוק את איש הקשר?');
-    if(!ok) return;
-    try{
-      await deleteContactFromServer(editingContactId);
-      contactEditOverlay.classList.remove('open');
-      loadMessages();
-    }catch(err){
-      alert('שגיאה במחיקת איש הקשר: ' + err.message);
-    }
-  };
-
-  // ===== חיתוך תמונה באמצעות קלאודינרי =====
-  const cropOverlay = document.getElementById('cropOverlay');
-  const cropStage = document.getElementById('cropStage');
-  const cropImg = document.getElementById('cropImg');
-  const cropZoom = document.getElementById('cropZoom');
-  const CROP_STAGE_SIZE = 260;
-  const CROP_OUTPUT_SIZE = 320;
-  let cropState = null;
-
-  async function uploadToCloudinary(file){
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: 'POST', body: fd
-    });
-    if(!res.ok) throw new Error('שגיאת העלאה לקלאודינרי: ' + res.status);
-    const data = await res.json();
-    return data.secure_url;
-  }
-
-  function openCropper(imageDataUrl){
-    cropImg.onload = () => {
-      const naturalW = cropImg.naturalWidth;
-      const naturalH = cropImg.naturalHeight;
-      const coverScale = CROP_STAGE_SIZE / Math.min(naturalW, naturalH);
-      cropState = { naturalW, naturalH, coverScale, zoom: 1, x: 0, y: 0 };
-      cropZoom.value = '1';
-      applyCropTransform(true);
-      cropOverlay.classList.add('open');
-    };
-    cropImg.src = imageDataUrl;
-  }
-
-  function applyCropTransform(recenter){
-    if(!cropState) return;
-    const s = cropState.coverScale * cropState.zoom;
-    const w = cropState.naturalW * s;
-    const h = cropState.naturalH * s;
-    if(recenter){
-      cropState.x = (CROP_STAGE_SIZE - w) / 2;
-      cropState.y = (CROP_STAGE_SIZE - h) / 2;
-    } else {
-      const minX = CROP_STAGE_SIZE - w, maxX = 0;
-      const minY = CROP_STAGE_SIZE - h, maxY = 0;
-      cropState.x = Math.min(maxX, Math.max(minX, cropState.x));
-      cropState.y = Math.min(maxY, Math.max(minY, cropState.y));
-    }
-    cropImg.style.width = w + 'px';
-    cropImg.style.height = h + 'px';
-    cropImg.style.transform = 'translate(' + cropState.x + 'px,' + cropState.y + 'px)';
-  }
-
-  cropZoom.oninput = () => {
-    if(!cropState) return;
-    cropState.zoom = parseFloat(cropZoom.value);
-    applyCropTransform(false);
-  };
-
-  let dragStart = null;
-  cropStage.addEventListener('pointerdown', (e) => {
-    if(!cropState) return;
-    dragStart = { x: e.clientX, y: e.clientY, origX: cropState.x, origY: cropState.y };
-    cropStage.classList.add('dragging');
-    cropStage.setPointerCapture(e.pointerId);
-  });
-  cropStage.addEventListener('pointermove', (e) => {
-    if(!dragStart || !cropState) return;
-    cropState.x = dragStart.origX + (e.clientX - dragStart.x);
-    cropState.y = dragStart.origY + (e.clientY - dragStart.y);
-    applyCropTransform(false);
-  });
-  function endDrag(){ dragStart = null; cropStage.classList.remove('dragging'); }
-  cropStage.addEventListener('pointerup', endDrag);
-  cropStage.addEventListener('pointercancel', endDrag);
-
-  document.getElementById('cropCancelBtn').onclick = () => {
-    cropOverlay.classList.remove('open');
-    contactPhotoInput.value = '';
-    cropState = null;
-  };
-
-  document.getElementById('cropConfirmBtn').onclick = () => {
-    if(!cropState) return;
-    const s = cropState.coverScale * cropState.zoom;
-    const sx = -cropState.x / s;
-    const sy = -cropState.y / s;
-    const sSize = CROP_STAGE_SIZE / s;
-    const canvas = document.createElement('canvas');
-    canvas.width = CROP_OUTPUT_SIZE;
-    canvas.height = CROP_OUTPUT_SIZE;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(cropImg, sx, sy, sSize, sSize, 0, 0, CROP_OUTPUT_SIZE, CROP_OUTPUT_SIZE);
-
-    const confirmBtn = document.getElementById('cropConfirmBtn');
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'מעלה תמונה…';
-    
-    canvas.toBlob(async (blob) => {
-      try{
-        const url = await uploadToCloudinary(blob);
-        pendingAvatarPhoto = url;
-        refreshAvatarPreview();
-        cropOverlay.classList.remove('open');
-        contactPhotoInput.value = '';
-        cropState = null;
-      }catch(err){
-        alert('שגיאה בהעלאת התמונה: ' + err.message);
-      }finally{
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'אישור חיתוך';
-      }
-    }, 'image/jpeg', 0.9);
-  };
-
-  contactPhotoInput.onchange = () => {
-    const file = contactPhotoInput.files && contactPhotoInput.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => openCropper(reader.result);
-    reader.readAsDataURL(file);
-  };
-
-  // ===== בניית ההודעות (+ תמלול ואווטאר צבעוני) =====
-
-  function buildMessageBubble(file, audioUrl){
-    
-    const meta = extractFileMetadata(file);
-    const matchedPhone = meta.phone;
-    
-    // שליפה נכונה של איש הקשר בהתבסס על ההתאמה (שתתבצע כעת בצורה חלקה גם ללא 0)
-    const contact = matchedPhone ? findContactByPhone(matchedPhone) : null;
-    
-    let displayPhone = matchedPhone || '';
-    if(displayPhone && !displayPhone.startsWith('0') && !displayPhone.startsWith('972')) {
-       displayPhone = '0' + displayPhone; 
-    } else if (displayPhone.startsWith('972')) {
-       displayPhone = '0' + displayPhone.slice(3);
-    }
-    
-    const displayName = contact ? contact.name : (displayPhone || file.name.replace(/\.[^/.]+$/, ""));
-    
-    const row = document.createElement('div');
-    row.className = 'rec-row';
-
-    const col = document.createElement('div');
-    col.className = 'rec-col';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'rec-bubble';
-
-    const avatarWrap = document.createElement('div');
-    avatarWrap.className = 'voice-avatar-wrap';
-    const avatar = document.createElement('div');
-    avatar.className = 'voice-avatar';
-    
-    // שינוי והתאמה מדויקת כאן: כעת אנו מעבירים רק את אובייקט ה-contact האמיתי.
-    // אם הוא null, הפונקציה contactAvatarHTML תחזיר ישירות את האייקון הדיפולטי האפור.
-    avatar.innerHTML = '<div class="voice-avatar-img">' + contactAvatarHTML(contact) + '</div>' +
-                       '<span class="voice-avatar-badge">' + ICON_MIC + '</span>';
-
-    const tooltip = document.createElement('div');
-    tooltip.className = 'voice-tooltip';
-    
-    // בניית תוכן הטולטיפ בהתאם לעיצוב באתר השני 
-    const ttName = document.createElement('b');
-    ttName.textContent = displayName;
-    tooltip.appendChild(ttName);
-    
-    if(meta.dateStr){
-        const dateRow = document.createElement('div');
-        dateRow.className = 'tt-row';
-        dateRow.innerHTML = 'תאריך: <span>' + meta.dateStr + '</span>';
-        tooltip.appendChild(dateRow);
-    }
-    
-    if(meta.timeStr){
-        const timeRow = document.createElement('div');
-        timeRow.className = 'tt-row';
-        timeRow.innerHTML = 'שעה: <span>' + meta.timeStr + '</span>';
-        tooltip.appendChild(timeRow);
-    }
-
-    const durRow = document.createElement('div');
-    durRow.className = 'tt-row tt-dur';
-    durRow.innerHTML = 'משך: <span>0:00</span>';
-    tooltip.appendChild(durRow);
-
-    function positionTooltip(){
-      const rect = avatar.getBoundingClientRect();
-      const margin = 8;
-      const centerX = rect.left + rect.width/2;
-      const tw = tooltip.offsetWidth;
-      let left = centerX - tw/2;
-      left = Math.max(margin, Math.min(left, window.innerWidth - tw - margin));
-      tooltip.style.left = left + 'px';
-      tooltip.style.bottom = (window.innerHeight - (rect.top - 9)) + 'px';
-      tooltip.style.setProperty('--arrow-x', (centerX - left) + 'px');
-    }
-    avatarWrap.addEventListener('mouseenter', () => { positionTooltip(); tooltip.classList.add('show'); });
-    avatarWrap.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
-    avatarWrap.appendChild(avatar);
-    avatarWrap.appendChild(tooltip);
-
-    const playBtn = document.createElement('button');
-    playBtn.className = 'play-btn';
-    playBtn.innerHTML = ICON_PLAY;
-    playBtn.setAttribute('aria-label', 'נגן');
-
-    const waveRow = document.createElement('div');
-    waveRow.className = 'rec-wave-row';
-    const waveform = document.createElement('div');
-    waveform.className = 'waveform';
-    waveform.tabIndex = 0;
-    const bars = [];
-    pseudoWaveform(file.name).forEach(p => {
-      const bar = document.createElement('div');
-      bar.className = 'wf-bar';
-      bar.style.height = Math.round(p*22) + 'px';
-      waveform.appendChild(bar);
-      bars.push(bar);
-    });
-    const thumb = document.createElement('div');
-    thumb.className = 'wf-thumb';
-    waveform.appendChild(thumb);
-
-    const timeLabel = document.createElement('span');
-    timeLabel.className = 'rec-time';
-    timeLabel.textContent = '0:00';
-    waveRow.appendChild(waveform);
-    waveRow.appendChild(timeLabel);
-
-    bubble.appendChild(avatarWrap);
-    bubble.appendChild(playBtn);
-    bubble.appendChild(waveRow);
-
-    col.appendChild(bubble);
-
-    // ===== תמלול הודעה =====
-    const transcriptWrap = document.createElement('div');
-    transcriptWrap.className = 'transcript-wrap';
-    col.appendChild(transcriptWrap);
-
-    function renderTranscriptBox(text){
-      transcriptWrap.innerHTML = '';
-      const box = document.createElement('div');
-      box.className = 'transcript-box';
-      const p = document.createElement('p');
-      p.className = 'transcript-text collapsed';
-      p.textContent = text;
-      box.appendChild(p);
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'transcript-toggle';
-      toggle.textContent = 'הצג עוד';
-      toggle.onclick = () => {
-        const expanded = p.classList.toggle('collapsed') === false;
-        toggle.textContent = expanded ? 'הצג פחות' : 'הצג עוד';
-      };
-      box.appendChild(toggle);
-      transcriptWrap.appendChild(box);
-    }
-
-    function renderTranscribeButton(){
-      transcriptWrap.innerHTML = '';
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'transcript-btn';
-      btn.innerHTML = ICON_MIC + '<span>תמלול הודעה</span>';
-      
-      const apiKey = getSpeechApiKey();
-      if(!apiKey){
-         btn.disabled = true;
-         btn.title = "יש להגדיר מפתח Groq API בהגדרות למעלה (סמל גלגל השיניים) כדי לאפשר תמלול";
+        setPlayedRatio(audio.duration ? audio.currentTime / audio.duration : 0);
+        waveRafId = requestAnimationFrame(stepWaveform);
       }
 
-      btn.onclick = async () => {
-        btn.disabled = true;
-        btn.innerHTML = '<span>מתמלל...</span>';
-        try{
-          const text = await transcribeAudioUrl(audioUrl, file.name);
-          setCachedTranscript(file.name, text);
-          renderTranscriptBox(text);
-        }catch(err){
-          transcriptWrap.innerHTML = '';
-          const errBox = document.createElement('div');
-          errBox.className = 'transcript-box';
-          const errP = document.createElement('p');
-          errP.className = 'transcript-text error';
-          errP.textContent = 'שגיאה בתמלול: ' + err.message;
-          errBox.appendChild(errP);
-          transcriptWrap.appendChild(errBox);
-        }
-      };
-      transcriptWrap.appendChild(btn);
-    }
-
-    const cachedTranscript = getCachedTranscript(file.name);
-    if(cachedTranscript) renderTranscriptBox(cachedTranscript);
-    else renderTranscribeButton();
-
-    row.appendChild(col);
-
-    function setPeaks(peaks){ peaks.forEach((p,i) => { if(bars[i]) bars[i].style.height = Math.round(p*22) + 'px'; }); }
-    function setPlayedRatio(ratio){
-      ratio = Math.max(0, Math.min(1, ratio || 0));
-      const exact = ratio * BAR_COUNT;
-      const cut = Math.floor(exact);
-      const frac = exact - cut;
-      bars.forEach((b,i) => {
-        if(i < cut){ b.classList.add('played'); b.style.background = ''; }
-        else if(i === cut && frac > 0){
-          b.classList.remove('played');
-          const pct = (frac*100).toFixed(1) + '%';
-          b.style.background = 'linear-gradient(to left, var(--accent) ' + pct + ', #D1D7DB ' + pct + ')';
-        } else { b.classList.remove('played'); b.style.background = ''; }
-      });
-      thumb.style.right = (ratio*100) + '%';
-    }
-
-    let waveformDataPromise = null;
-    let waveformDataResult = null;
-    function getWaveformData(){
-      if(!waveformDataPromise){
-        waveformDataPromise = computeWaveform(audioUrl).then(result => {
-          waveformDataResult = result;
-          return result;
+      function ensureAudio() {
+        if (audio) return audio;
+        audio = new Audio(audioUrl);
+        audio.preload = 'auto';
+        audio.addEventListener('loadedmetadata', () => {
+          if (audio.paused) timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
+          if (pendingSeekRatio !== null && audio.duration) {
+            audio.currentTime = pendingSeekRatio * audio.duration;
+            setPlayedRatio(pendingSeekRatio);
+            timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
+            pendingSeekRatio = null;
+          }
         });
-      }
-      return waveformDataPromise;
-    }
-    
-    getWaveformData().then(result => {
-      if(result){
-        setPeaks(result.peaks);
-        if(result.duration){
-          durRow.querySelector('span').textContent = fmtTime(result.duration);
-          if(!audio) timeLabel.textContent = fmtRemaining(0, result.duration);
-        }
-      }
-    });
-
-    let audio = null;
-    let waveRafId = null;
-    let pendingSeekRatio = null;
-
-    function stepWaveform(){
-      if(!audio || audio.paused){ waveRafId = null; return; }
-      setPlayedRatio(audio.duration ? audio.currentTime/audio.duration : 0);
-      waveRafId = requestAnimationFrame(stepWaveform);
-    }
-
-    function ensureAudio(){
-      if(audio) return audio;
-      const readyBlobUrl = (waveformDataResult && waveformDataResult.blobUrl) || null;
-      audio = new Audio(readyBlobUrl || audioUrl);
-      audio._usingBlob = !!readyBlobUrl;
-      audio.preload = 'auto';
-
-      if(!readyBlobUrl){
-        getWaveformData().then(result => {
-          if(!result || !result.blobUrl || !audio || audio._usingBlob) return;
-          const wasPlaying = !audio.paused;
-          const t = audio.currentTime || 0;
-          audio._usingBlob = true;
-          const onReady = () => {
-            audio.removeEventListener('loadedmetadata', onReady);
-            audio.currentTime = t;
-            if(wasPlaying) audio.play();
-          };
-          audio.addEventListener('loadedmetadata', onReady);
-          audio.src = result.blobUrl;
-        });
-      }
-
-      audio.addEventListener('loadedmetadata', () => {
-        if(audio.paused) timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
-        if(audio.duration) durRow.querySelector('span').textContent = fmtTime(audio.duration);
-        if(pendingSeekRatio !== null && audio.duration){
-          audio.currentTime = pendingSeekRatio * audio.duration;
-          setPlayedRatio(pendingSeekRatio);
+        audio.addEventListener('timeupdate', () => {
           timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
-          pendingSeekRatio = null;
-        }
-      });
-      audio.addEventListener('timeupdate', () => {
-        timeLabel.textContent = fmtRemaining(audio.currentTime, audio.duration);
-      });
-      audio.addEventListener('ended', () => {
-        playBtn.innerHTML = ICON_PLAY;
-        setPlayedRatio(0);
-        timeLabel.textContent = fmtRemaining(0, audio.duration);
-        if(activeAudio === audio){ activeAudio = null; activePlayBtn = null; activeSetPlayed = null; }
-        const next = row.nextElementSibling;
-        if(next && next.classList && next.classList.contains('rec-row')){
-          setTimeout(() => {
-            const nextBtn = next.querySelector('.play-btn');
-            if(nextBtn) nextBtn.click();
-          }, 350);
-        }
-      });
-      return audio;
-    }
-
-    playBtn.onclick = () => {
-      ensureAudio();
-      if(activeAudio && activeAudio !== audio){
-        activeAudio.pause();
-        if(activePlayBtn) activePlayBtn.innerHTML = ICON_PLAY;
-        if(activeSetPlayed) activeSetPlayed(0);
+        });
+        audio.addEventListener('ended', () => {
+          playBtn.innerHTML = ICON_PLAY;
+          setPlayedRatio(0);
+          timeLabel.textContent = fmtRemaining(0, audio.duration);
+          if (activeAudio === audio) {
+            activeAudio = null;
+            activePlayBtn = null;
+            activeSetPlayed = null;
+          }
+          const next = row.nextElementSibling;
+          if (next && next.classList && next.classList.contains('rec-row')) {
+            setTimeout(() => {
+              const nextBtn = next.querySelector('.play-btn');
+              if (nextBtn) nextBtn.click();
+            }, 350);
+          }
+        });
+        return audio;
       }
-      if(audio.paused){
-        audio.play();
-        playBtn.innerHTML = ICON_PAUSE;
-        activeAudio = audio; activePlayBtn = playBtn; activeSetPlayed = setPlayedRatio;
-        if(waveRafId === null) waveRafId = requestAnimationFrame(stepWaveform);
-      } else {
-        audio.pause();
-        playBtn.innerHTML = ICON_PLAY;
-      }
-    };
 
-    let seekToken = 0;
-    waveform.onclick = (e) => {
-      ensureAudio();
-      const rect = waveform.getBoundingClientRect();
-      const ratio = Math.max(0, Math.min(1, 1 - ((e.clientX - rect.left) / rect.width)));
-      if(audio.duration && isFinite(audio.duration)){
-        const wasPlaying = !audio.paused;
-        const myToken = ++seekToken;
-        if(wasPlaying) audio.pause();
-        const target = ratio * audio.duration;
-        setPlayedRatio(ratio);
-        timeLabel.textContent = fmtRemaining(target, audio.duration);
-        pendingSeekRatio = null;
-        if(wasPlaying){
-          const resumePlayback = () => {
-            audio.removeEventListener('seeked', resumePlayback);
-            audio.removeEventListener('timeupdate', resumePlayback);
-            if(myToken !== seekToken) return; 
-            audio.play();
-            if(waveRafId === null) waveRafId = requestAnimationFrame(stepWaveform);
-          };
-          audio.addEventListener('seeked', resumePlayback);
-          audio.addEventListener('timeupdate', resumePlayback);
+      playBtn.onclick = () => {
+        ensureAudio();
+        if (activeAudio && activeAudio !== audio) {
+          activeAudio.pause();
+          if (activePlayBtn) activePlayBtn.innerHTML = ICON_PLAY;
+          if (activeSetPlayed) activeSetPlayed(0);
         }
-        audio.currentTime = target;
-      } else {
-        pendingSeekRatio = ratio;
-        setPlayedRatio(ratio);
-        if(audio.readyState === 0) audio.load();
-      }
-    };
-
-    return row;
-  }
-
-  // ===== משיכת ההודעות מהשרת =====
-  async function loadMessages(){
-    const messagesList = document.getElementById('messages-list');
-    setStatus('טוען הודעות...');
-
-    try{
-      const response = await fetch('/api/messages');
-      const data = await response.json();
-
-      if(data.responseStatus === "OK"){
-        let audioFiles = data.files || [];
-
-        if(audioFiles.length > 0){
-          messagesList.innerHTML = '';
-          audioFiles.forEach(file => {
-            const audioUrl = `/api/audio?name=${encodeURIComponent(file.name)}`;
-            messagesList.appendChild(buildMessageBubble(file, audioUrl));
-          });
-          setTimeout(() => { messagesList.scrollTop = messagesList.scrollHeight; }, 100);
+        if (audio.paused) {
+          audio.play();
+          playBtn.innerHTML = ICON_PAUSE;
+          activeAudio = audio;
+          activePlayBtn = playBtn;
+          activeSetPlayed = setPlayedRatio;
+          if (waveRafId === null) waveRafId = requestAnimationFrame(stepWaveform);
         } else {
-          setStatus('לא נמצאו הודעות קוליות בשלוחה זו.');
+          audio.pause();
+          playBtn.innerHTML = ICON_PLAY;
         }
-      } else {
-        setStatus(`שגיאה מהשרת: ${data.message || 'שגיאה לא ידועה בבקשת הנתונים'}`, true);
-      }
-    }catch(error){
-      console.error('Fetch error:', error);
-      setStatus('שגיאת תקשורת במשיכת ההודעות.', true);
+      };
+
+      waveform.onclick = (e) => {
+        ensureAudio();
+        const rect = waveform.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, 1 - ((e.clientX - rect.left) / rect.width)));
+        if (audio.duration && isFinite(audio.duration)) {
+          const wasPlaying = !audio.paused;
+          if (wasPlaying) audio.pause();
+          const target = ratio * audio.duration;
+          setPlayedRatio(ratio);
+          timeLabel.textContent = fmtRemaining(target, audio.duration);
+          audio.currentTime = target;
+          if (wasPlaying) {
+            const resume = () => {
+              audio.removeEventListener('seeked', resume);
+              audio.play();
+              if (waveRafId === null) waveRafId = requestAnimationFrame(stepWaveform);
+            };
+            audio.addEventListener('seeked', resume);
+          }
+        } else {
+          pendingSeekRatio = ratio;
+          setPlayedRatio(ratio);
+          if (audio.readyState === 0) audio.load();
+        }
+      };
+
+      return row;
     }
-  }
-</script>
+
+    // ===== משיכת ההודעות =====
+    async function loadMessages() {
+      const listUrl = BASE_URL + `GetIVR2Dir?token=${IVR_TOKEN}&path=${IVR_PATH}`;
+      const messagesList = document.getElementById('messages-list');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      refreshBtn.classList.add('spin');
+      setStatus('טוען הודעות...');
+
+      try {
+        const [response, contactsMap] = await Promise.all([
+          fetch(listUrl),
+          getContactsMap()
+        ]);
+        const data = await response.json();
+
+        if (data.responseStatus === "OK") {
+          let audioFiles = data.files
+            ? data.files.filter(f => f.name.endsWith('.wav') || f.name.endsWith('.mp3'))
+            : [];
+          audioFiles.sort((a, b) => {
+            const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
+            return numA - numB;
+          });
+
+          if (audioFiles.length > 0) {
+            messagesList.innerHTML = '';
+            audioFiles.forEach(file => {
+              const audioUrl = `${BASE_URL}DownloadFile?token=${IVR_TOKEN}&path=${IVR_PATH}/${file.name}`;
+              messagesList.appendChild(buildMessageBubble(file, audioUrl, contactsMap));
+            });
+            setTimeout(() => {
+              messagesList.scrollTop = messagesList.scrollHeight;
+            }, 100);
+          } else {
+            setStatus('לא נמצאו הודעות קוליות בשלוחה זו.');
+          }
+        } else {
+          setStatus(`שגיאה מהשרת: ${data.message || 'שגיאה לא ידועה'}`, true);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        setStatus('שגיאת תקשורת במשיכת ההודעות.', true);
+      } finally {
+        refreshBtn.classList.remove('spin');
+      }
+    }
+
+    document.getElementById('refreshBtn').onclick = () => {
+      document.getElementById('refreshBtn').classList.add('spin');
+      contactsMapPromise = null; // לרענן גם את רשימת אנשי הקשר
+      loadMessages().finally(() => {
+        document.getElementById('refreshBtn').classList.remove('spin');
+      });
+    };
+  </script>
 </body>
 </html>
