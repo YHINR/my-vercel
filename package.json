@@ -1,0 +1,17 @@
+{
+  "name": "voicemail-app",
+  "version": "1.0.0",
+  "description": "Voicemail system with admin dashboard",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@vercel/kv": "^0.2.3"
+  },
+  "devDependencies": {
+    "vercel": "latest"
+  }
+}

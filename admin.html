@@ -5,189 +5,326 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>לוח ניהול - הודעות שלוחה</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { direction: rtl; }
-    body { font-family: 'Assistant', 'Segoe UI', sans-serif; }
-    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .stat-card { transition: all 0.3s ease; }
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px rgba(0,0,0,0.15); }
-    .log-row { transition: background 0.2s ease; }
-    .log-row:hover { background-color: #f3f4f6; }
-    .fade-in { animation: fadeIn 0.5s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    body { 
+      font-family: 'Assistant', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-top: 4px solid;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at top right, rgba(255,255,255,0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card.blue { border-top-color: #3b82f6; }
+    .stat-card.green { border-top-color: #10b981; }
+    .stat-card.red { border-top-color: #ef4444; }
+    .stat-card.purple { border-top-color: #a855f7; }
+    .stat-card.orange { border-top-color: #f97316; }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--color1) 0%, var(--color2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .stat-card.blue { --color1: #3b82f6; --color2: #1e40af; }
+    .stat-card.green { --color1: #10b981; --color2: #047857; }
+    .stat-card.red { --color1: #ef4444; --color2: #b91c1c; }
+    .stat-card.purple { --color1: #a855f7; --color2: #6b21a8; }
+    .stat-card.orange { --color1: #f97316; --color2: #c2410c; }
+    
+    .chart-container {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+    
+    .nav-bar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .table-container {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .log-row {
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s ease;
+    }
+    
+    .log-row:hover {
+      background-color: #f8f9fb;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    .status-success {
+      background-color: #d1fae5;
+      color: #047857;
+    }
+    
+    .status-failed {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+    
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background-color: #059669;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+    }
+    
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
-<body class="bg-gray-100">
+<body>
 
-<!-- Navigation -->
-<nav class="bg-white shadow-lg border-b-4 border-indigo-600">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-16">
-      <div class="flex items-center gap-3">
-        <div class="text-2xl">📊</div>
-        <h1 class="text-2xl font-bold text-gray-900">לוח ניהול הודעות</h1>
+<!-- Navigation Bar -->
+<div class="nav-bar">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex justify-between items-center py-4">
+      <div class="flex items-center gap-4">
+        <span class="text-4xl">📊</span>
+        <div>
+          <h1 class="text-2xl font-bold">לוח ניהול הודעות שלוחה</h1>
+          <p class="text-sm text-purple-200 mt-1">ניהול וניתוח כל הניסיונות</p>
+        </div>
       </div>
-      <div class="flex gap-4 items-center">
-        <span id="adminPhone" class="text-sm text-gray-600">📱 טוען...</span>
-        <button onclick="goBack()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition font-medium">
-          ← חזור
-        </button>
-        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition font-medium">
-          התנתקות
-        </button>
+      <div class="flex gap-3">
+        <span id="adminPhone" class="text-sm bg-white bg-opacity-20 px-4 py-2 rounded-lg">📱 טוען...</span>
+        <button onclick="goBack()" class="btn bg-white text-purple-600 hover:bg-opacity-90">← חזור</button>
+        <button onclick="logout()" class="btn btn-danger">התנתקות</button>
       </div>
     </div>
   </div>
-</nav>
+</div>
 
-<div class="max-w-7xl mx-auto p-6 space-y-6 fade-in">
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto p-6 space-y-6">
 
-  <!-- Stats Grid -->
+  <!-- Statistics Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-    <!-- Total -->
-    <div class="stat-card bg-white rounded-xl shadow-md p-6 border-t-4 border-blue-500">
-      <div class="flex justify-between items-center">
+    <div class="stat-card blue">
+      <div class="flex justify-between items-start">
         <div>
-          <p class="text-gray-600 text-sm font-medium">סך הנסיונות</p>
-          <p class="text-3xl font-bold text-blue-600 mt-2" id="stat-total">0</p>
+          <p class="text-gray-600 text-sm font-semibold mb-2">📞 סך הנסיונות</p>
+          <div class="stat-number" id="stat-total">0</div>
         </div>
-        <div class="text-4xl opacity-20">📞</div>
+        <span class="text-3xl opacity-30">📱</span>
       </div>
     </div>
 
-    <!-- Success -->
-    <div class="stat-card bg-white rounded-xl shadow-md p-6 border-t-4 border-green-500">
-      <div class="flex justify-between items-center">
+    <div class="stat-card green">
+      <div class="flex justify-between items-start">
         <div>
-          <p class="text-gray-600 text-sm font-medium">הצלחות ✓</p>
-          <p class="text-3xl font-bold text-green-600 mt-2" id="stat-success">0</p>
+          <p class="text-gray-600 text-sm font-semibold mb-2">✓ הצלחות</p>
+          <div class="stat-number" id="stat-success">0</div>
         </div>
-        <div class="text-4xl opacity-20">✅</div>
+        <span class="text-3xl opacity-30">✅</span>
       </div>
     </div>
 
-    <!-- Failed -->
-    <div class="stat-card bg-white rounded-xl shadow-md p-6 border-t-4 border-red-500">
-      <div class="flex justify-between items-center">
+    <div class="stat-card red">
+      <div class="flex justify-between items-start">
         <div>
-          <p class="text-gray-600 text-sm font-medium">כשלונות ✗</p>
-          <p class="text-3xl font-bold text-red-600 mt-2" id="stat-failed">0</p>
+          <p class="text-gray-600 text-sm font-semibold mb-2">✗ כשלונות</p>
+          <div class="stat-number" id="stat-failed">0</div>
         </div>
-        <div class="text-4xl opacity-20">❌</div>
+        <span class="text-3xl opacity-30">❌</span>
       </div>
     </div>
 
-    <!-- Unique -->
-    <div class="stat-card bg-white rounded-xl shadow-md p-6 border-t-4 border-purple-500">
-      <div class="flex justify-between items-center">
+    <div class="stat-card purple">
+      <div class="flex justify-between items-start">
         <div>
-          <p class="text-gray-600 text-sm font-medium">טלפונים ייחודיים</p>
-          <p class="text-3xl font-bold text-purple-600 mt-2" id="stat-unique">0</p>
+          <p class="text-gray-600 text-sm font-semibold mb-2">👥 ייחודיים</p>
+          <div class="stat-number" id="stat-unique">0</div>
         </div>
-        <div class="text-4xl opacity-20">👥</div>
+        <span class="text-3xl opacity-30">👤</span>
       </div>
     </div>
 
-    <!-- Today -->
-    <div class="stat-card bg-white rounded-xl shadow-md p-6 border-t-4 border-orange-500">
-      <div class="flex justify-between items-center">
+    <div class="stat-card orange">
+      <div class="flex justify-between items-start">
         <div>
-          <p class="text-gray-600 text-sm font-medium">הניסיונות היום</p>
-          <p class="text-3xl font-bold text-orange-600 mt-2" id="stat-today">0</p>
+          <p class="text-gray-600 text-sm font-semibold mb-2">📅 היום</p>
+          <div class="stat-number" id="stat-today">0</div>
         </div>
-        <div class="text-4xl opacity-20">📅</div>
+        <span class="text-3xl opacity-30">🕐</span>
       </div>
     </div>
   </div>
 
   <!-- Chart -->
-  <div class="bg-white rounded-xl shadow-lg p-6">
-    <div class="flex items-center gap-3 mb-4">
+  <div class="chart-container">
+    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
       <span class="text-2xl">📈</span>
-      <h2 class="text-xl font-bold text-gray-900">פעילות ב-24 השעות האחרונות</h2>
-    </div>
+      פעילות ב-24 השעות האחרונות
+    </h2>
     <canvas id="activityChart" height="80"></canvas>
   </div>
 
   <!-- Search & Filters -->
-  <div class="bg-white rounded-xl shadow-lg p-6">
-    <div class="flex flex-col sm:flex-row gap-3">
-      <div class="flex-1">
-        <label class="block text-sm font-medium text-gray-700 mb-2">🔍 חפש לפי מספר טלפון</label>
+  <div class="chart-container">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">🔍 חפש טלפון</label>
         <input 
           type="text" 
           id="searchPhone"
-          placeholder="הקלד מספר טלפון..."
-          class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 transition"
+          placeholder="הקלד מספר..."
+          class="w-full px-4 py-2 border-2 border-gray-200 rounded-10 focus:outline-none focus:border-purple-500 transition"
           onkeyup="filterLogs()"
         >
       </div>
-      <div class="flex-1">
-        <label class="block text-sm font-medium text-gray-700 mb-2">⚙️ סנן לפי סטטוס</label>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">⚙️ סנן סטטוס</label>
         <select 
           id="filterStatus"
           onchange="filterLogs()"
-          class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 transition"
+          class="w-full px-4 py-2 border-2 border-gray-200 rounded-10 focus:outline-none focus:border-purple-500 transition"
         >
           <option value="">הכל</option>
           <option value="success">✓ הצלחות בלבד</option>
           <option value="failed">✗ כשלונות בלבד</option>
         </select>
       </div>
-      <div class="flex items-end gap-2">
-        <button 
-          onclick="refreshLogs()"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition font-medium flex items-center gap-2"
-        >
-          🔄 רענן
-        </button>
-        <button 
-          onclick="exportLogs()"
-          class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition font-medium flex items-center gap-2"
-        >
-          📥 ייצוא
-        </button>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">&nbsp;</label>
+        <button onclick="refreshLogs()" class="w-full btn btn-primary">🔄 רענן</button>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">&nbsp;</label>
+        <button onclick="exportLogs()" class="w-full btn btn-success">📥 ייצוא CSV</button>
       </div>
     </div>
   </div>
 
   <!-- Logs Table -->
-  <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-    <div class="px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+  <div class="table-container">
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4">
       <h2 class="text-xl font-bold flex items-center gap-2">
         <span class="text-2xl">📝</span>
         רשימת כל הניסיונות
       </h2>
     </div>
+    
     <div class="overflow-x-auto">
       <table class="w-full">
-        <thead class="bg-gray-100 border-b-2 border-gray-300">
+        <thead class="bg-gray-50 border-b-2 border-gray-200">
           <tr>
-            <th class="px-6 py-3 text-right text-sm font-bold text-gray-700">📱 מספר טלפון</th>
-            <th class="px-6 py-3 text-right text-sm font-bold text-gray-700">🕐 תאריך וזמן</th>
-            <th class="px-6 py-3 text-right text-sm font-bold text-gray-700">✓ סטטוס</th>
-            <th class="px-6 py-3 text-right text-sm font-bold text-gray-700">💬 סיבה</th>
-            <th class="px-6 py-3 text-right text-sm font-bold text-gray-700">🎵 הודעות</th>
+            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">📱 טלפון</th>
+            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">🕐 תאריך וזמן</th>
+            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">✓ סטטוס</th>
+            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">💬 סיבה</th>
+            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">🎵 הודעות</th>
           </tr>
         </thead>
         <tbody id="logsTableBody">
-          <tr class="text-center text-gray-500">
-            <td colspan="5" class="py-12">⏳ טוען נתונים...</td>
+          <tr>
+            <td colspan="5" class="text-center py-12 text-gray-500">⏳ טוען נתונים...</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-</div>
+  <!-- Empty State -->
+  <div id="emptyState" class="hidden table-container">
+    <div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      <h3 class="text-2xl font-bold text-gray-900 mb-2">אין נתונים עדיין</h3>
+      <p class="text-gray-600">לא נרשמו ניסיונות התקשרות. חכה לניסיונות חדשים.</p>
+    </div>
+  </div>
 
-<!-- Empty State -->
-<div id="emptyState" class="hidden max-w-7xl mx-auto p-12 text-center">
-  <div class="text-6xl mb-4">📭</div>
-  <h3 class="text-2xl font-bold text-gray-900 mb-2">אין נתונים עדיין</h3>
-  <p class="text-gray-600">לא נרשמו ניסיונות התקשרות. חכה לניסיונות חדשים או רענן את הדף.</p>
 </div>
 
 <script>
@@ -205,7 +342,7 @@ function checkAuth() {
   
   const stored = sessionStorage.getItem('adminPhone');
   if (!stored) {
-    window.location.href = '/index.html';
+    window.location.href = '/';
     return false;
   }
   
@@ -214,11 +351,11 @@ function checkAuth() {
 
 function logout() {
   sessionStorage.removeItem('adminPhone');
-  window.location.href = '/index.html';
+  window.location.href = '/';
 }
 
 function goBack() {
-  window.location.href = '/index.html';
+  window.location.href = '/';
 }
 
 async function refreshLogs() {
@@ -239,10 +376,8 @@ async function refreshLogs() {
       
       if (allLogs.length === 0) {
         document.getElementById('emptyState').classList.remove('hidden');
-        document.querySelector('table').parentElement.classList.add('hidden');
       } else {
         document.getElementById('emptyState').classList.add('hidden');
-        document.querySelector('table').parentElement.classList.remove('hidden');
       }
     }
   } catch (err) {
@@ -262,21 +397,21 @@ function renderLogs(logs) {
   const tbody = document.getElementById('logsTableBody');
   
   if (logs.length === 0) {
-    tbody.innerHTML = '<tr class="text-center text-gray-500"><td colspan="5" class="py-12">אין נתונים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-12 text-gray-500">אין נתונים</td></tr>';
     return;
   }
 
   tbody.innerHTML = logs.map((log, idx) => `
-    <tr class="log-row border-b border-gray-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
-      <td class="px-6 py-4 font-bold text-lg text-indigo-600">${log.phone}</td>
+    <tr class="log-row">
+      <td class="px-6 py-4 font-bold text-base text-indigo-600">${log.phone}</td>
       <td class="px-6 py-4 text-sm text-gray-600">
         <div class="font-medium">${log.date || ''}</div>
         <div class="text-xs text-gray-400">${log.time || ''}</div>
       </td>
       <td class="px-6 py-4">
         ${log.success 
-          ? '<span class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✓ הצלחה</span>' 
-          : '<span class="inline-flex items-center gap-2 bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">✗ כשל</span>'}
+          ? '<span class="status-badge status-success">✓ הצלחה</span>' 
+          : '<span class="status-badge status-failed">✗ כשל</span>'}
       </td>
       <td class="px-6 py-4 text-sm text-gray-700">${log.reason || '-'}</td>
       <td class="px-6 py-4 text-center font-bold text-indigo-600">${log.messages_count || '-'}</td>
@@ -339,24 +474,43 @@ function updateChart(logs) {
           label: 'מספר נסיונות',
           data,
           borderColor: '#667eea',
-          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          backgroundColor: 'rgba(102, 126, 234, 0.08)',
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointRadius: 5,
+          pointRadius: 6,
           pointBackgroundColor: '#667eea',
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
+          pointHoverRadius: 8,
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
         plugins: { 
-          legend: { display: true, labels: { usePointStyle: true, font: { size: 12 } } }
+          legend: { 
+            display: true, 
+            labels: { 
+              usePointStyle: true, 
+              font: { size: 13 },
+              padding: 20
+            } 
+          }
         },
         scales: { 
-          y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } } }
+          y: { 
+            beginAtZero: true, 
+            ticks: { stepSize: 1, font: { size: 12 } },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          }
         }
       }
     });
@@ -378,7 +532,7 @@ function exportLogs() {
       log.success ? 'הצלחה' : 'כשל',
       log.reason,
       log.messages_count || '-'
-    ].join(','))
+    ].map(v => `"${v}"`).join(','))
   ].join('\n');
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -388,12 +542,12 @@ function exportLogs() {
   link.click();
 }
 
-// רענון אוטומטי כל 30 שניות
+// רענון אוטומטי כל 20 שניות
 setInterval(() => {
   if (sessionStorage.getItem('adminPhone')) {
     refreshLogs();
   }
-}, 30000);
+}, 20000);
 
 // בדיקה התחלתית
 if (checkAuth()) {
