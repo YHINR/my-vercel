@@ -4,21 +4,16 @@
 import { kv } from '@vercel/kv';
 
 async function readLogs() {
-  try {
-    const data = await kv.get('voicemail_logs');
-    return data ? JSON.parse(data) : [];
-  } catch (err) {
-    console.error('Error reading logs from KV:', err);
-    return [];
-  }
+  const data = await kv.get('voicemail_logs');
+  if (!data) return [];
+  return typeof data === 'string' ? JSON.parse(data) : data;
 }
 
 async function writeLogs(logs) {
-  try {
-    await kv.set('voicemail_logs', JSON.stringify(logs), { ex: 86400 * 30 }); // שמור 30 ימים
-  } catch (err) {
-    console.error('Error writing logs to KV:', err);
-  }
+  // חשוב: בלי try/catch כאן - אם kv.set נכשל (למשל בגלל שאין
+  // חיבור KV/Redis תקין), אנחנו רוצים שהשגיאה תעלה החוצה
+  // ותוחזר ב-JSON, ולא תיבלע בשקט.
+  await kv.set('voicemail_logs', JSON.stringify(logs), { ex: 86400 * 30 });
 }
 
 export default async function handler(req, res) {
@@ -59,6 +54,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, id: entry.id, total: logs.length });
   } catch (err) {
     console.error('Log error:', err);
-    return res.status(500).json({ ok: false, error: 'Failed to log attempt' });
+    // מחזירים את השגיאה האמיתית כדי שאפשר יהיה לראות אותה ב-Network tab בדפדפן
+    return res.status(500).json({ ok: false, error: 'Failed to log attempt', details: String(err && err.message || err) });
   }
 }

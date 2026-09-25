@@ -6,13 +6,9 @@ import { kv } from '@vercel/kv';
 const ADMIN_PHONE = '0548548689';
 
 async function readLogs() {
-  try {
-    const data = await kv.get('voicemail_logs');
-    return data ? JSON.parse(data) : [];
-  } catch (err) {
-    console.error('Error reading from KV:', err);
-    return [];
-  }
+  const data = await kv.get('voicemail_logs');
+  if (!data) return [];
+  return typeof data === 'string' ? JSON.parse(data) : data;
 }
 
 export default async function handler(req, res) {
@@ -56,6 +52,7 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('Admin logs error:', err);
-    return res.status(500).json({ ok: false, error: 'Server error' });
+    // מחזירים את השגיאה האמיתית כדי שאפשר יהיה לראות אותה ב-Network tab בדפדפן
+    return res.status(500).json({ ok: false, error: 'Server error', details: String(err && err.message || err) });
   }
 }
