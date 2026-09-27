@@ -1,566 +1,491 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiIGZpbGw9IiMwMEE4ODQiLz48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMi40IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDYsNikgc2NhbGUoMC41KSIgZD0iTTIyIDE2LjkydjNhMiAyIDAgMCAxLTIuMTggMiAxOS43OSAxOS43OSAwIDAgMS04LjYzLTMuMDcgMTkuNSAxOS41IDAgMCAxLTYtNiAxOS43OSAxOS43OSAwIDAgMS0zLjA3LTguNjdBMiAyIDAgMCAxIDQuMTEgMmgzYTIgMiAwIDAgMSAyIDEuNzJjLjEyNy45Ni4zNjEgMS45MDMuNyAyLjgxYTIgMiAwIDAgMS0uNDUgMi4xMUw4LjA5IDkuOTFhMTYgMTYgMCAwIDAgNiA2bDEuMjctMS4yN2EyIDIgMCAwIDEgMi4xMS0uNDVjLjkwNy4zMzkgMS44NS41NzMgMi44MS43QTIgMiAwIDAgMSAyMiAxNi45MnoiLz48L3N2Zz4=">
-  <title>לוח ניהול - הודעות שלוחה</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * { direction: rtl; }
-    
-    body { 
-      font-family: 'Assistant', 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-    }
-    
-    .stat-card {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-top: 4px solid;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at top right, rgba(255,255,255,0.3) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    
-    .stat-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    }
-    
-    .stat-card.blue { border-top-color: #3b82f6; }
-    .stat-card.green { border-top-color: #10b981; }
-    .stat-card.red { border-top-color: #ef4444; }
-    .stat-card.purple { border-top-color: #a855f7; }
-    .stat-card.orange { border-top-color: #f97316; }
-    
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--color1) 0%, var(--color2) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .stat-card.blue { --color1: #3b82f6; --color2: #1e40af; }
-    .stat-card.green { --color1: #10b981; --color2: #047857; }
-    .stat-card.red { --color1: #ef4444; --color2: #b91c1c; }
-    .stat-card.purple { --color1: #a855f7; --color2: #6b21a8; }
-    .stat-card.orange { --color1: #f97316; --color2: #c2410c; }
-    
-    .chart-container {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      margin-bottom: 24px;
-    }
-    
-    .nav-bar {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px 0;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    
-    .table-container {
-      background: white;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    
-    .log-row {
-      border-bottom: 1px solid #f0f0f0;
-      transition: all 0.2s ease;
-    }
-    
-    .log-row:hover {
-      background-color: #f8f9fb;
-    }
-    
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-    
-    .status-success {
-      background-color: #d1fae5;
-      color: #047857;
-    }
-    
-    .status-failed {
-      background-color: #fee2e2;
-      color: #b91c1c;
-    }
-    
-    .btn {
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-danger {
-      background-color: #ef4444;
-      color: white;
-    }
-    
-    .btn-danger:hover {
-      background-color: #dc2626;
-    }
-    
-    .btn-success {
-      background-color: #10b981;
-      color: white;
-    }
-    
-    .btn-success:hover {
-      background-color: #059669;
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #6b7280;
-    }
-    
-    .empty-state-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול טריוויה</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .list-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        
+        .list-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-right: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-info strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .item-info small {
+            color: #888;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-right: 10px;
+            width: auto;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .edit-btn {
+            background: #28a745;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-right: 10px;
+            width: auto;
+        }
+        
+        .edit-btn:hover {
+            background: #218838;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            text-align: center;
+        }
+        
+        .stat-item h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-item p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-right: 4px solid #28a745;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-right: 4px solid #dc3545;
+        }
+        
+        .export-section {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-right: 4px solid #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .button-group button {
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
-
-<!-- Navigation Bar -->
-<div class="nav-bar">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex justify-between items-center py-4">
-      <div class="flex items-center gap-4">
-        <span class="text-4xl">📊</span>
-        <div>
-          <h1 class="text-2xl font-bold">לוח ניהול הודעות שלוחה</h1>
-          <p class="text-sm text-purple-200 mt-1">ניהול וניתוח כל הניסיונות</p>
+    <div class="container">
+        <h1>🎮 ניהול מערכת טריוויה</h1>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <h3 id="playerCount">0</h3>
+                <p>שחקנים רשומים</p>
+            </div>
+            <div class="stat-item">
+                <h3 id="questionCount">0</h3>
+                <p>שאלות מוגדרות</p>
+            </div>
         </div>
-      </div>
-      <div class="flex gap-3">
-        <span id="adminPhone" class="text-sm bg-white bg-opacity-20 px-4 py-2 rounded-lg">📱 טוען...</span>
-        <button onclick="goBack()" class="btn bg-white text-purple-600 hover:bg-opacity-90">← חזור</button>
-        <button onclick="logout()" class="btn btn-danger">התנתקות</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Main Content -->
-<div class="max-w-7xl mx-auto p-6 space-y-6">
-
-  <!-- Statistics Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-    <div class="stat-card blue">
-      <div class="flex justify-between items-start">
-        <div>
-          <p class="text-gray-600 text-sm font-semibold mb-2">📞 סך הנסיונות</p>
-          <div class="stat-number" id="stat-total">0</div>
+        
+        <div id="message"></div>
+        
+        <!-- הוספת שחקן -->
+        <div class="section">
+            <h2>➕ הוספת שחקן חדש</h2>
+            <div class="form-group">
+                <label for="idNumber">מספר תעודת זהות:</label>
+                <input type="text" id="idNumber" placeholder="למשל: 123456789">
+            </div>
+            <div class="form-group">
+                <label for="playerName">שם השחקן:</label>
+                <input type="text" id="playerName" placeholder="שם מלא">
+            </div>
+            <button onclick="addPlayer()">➕ הוסף שחקן</button>
         </div>
-        <span class="text-3xl opacity-30">📱</span>
-      </div>
-    </div>
-
-    <div class="stat-card green">
-      <div class="flex justify-between items-start">
-        <div>
-          <p class="text-gray-600 text-sm font-semibold mb-2">✓ הצלחות</p>
-          <div class="stat-number" id="stat-success">0</div>
+        
+        <!-- רשימת שחקנים -->
+        <div class="section">
+            <h2>📋 רשימת שחקנים</h2>
+            <div class="list-container" id="playersList">
+                <p style="color: #999; text-align: center;">אין שחקנים עדיין</p>
+            </div>
         </div>
-        <span class="text-3xl opacity-30">✅</span>
-      </div>
-    </div>
-
-    <div class="stat-card red">
-      <div class="flex justify-between items-start">
-        <div>
-          <p class="text-gray-600 text-sm font-semibold mb-2">✗ כשלונות</p>
-          <div class="stat-number" id="stat-failed">0</div>
+        
+        <!-- הוספת שאלה -->
+        <div class="section" id="questionSection" style="display: none;">
+            <h2>❓ הוספת שאלה טריוויה (לכל השחקנים)</h2>
+            <div class="form-group">
+                <label for="question">השאלה:</label>
+                <textarea id="question" placeholder="כתוב את השאלה כאן..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="correctAnswer">התשובה הנכונה:</label>
+                <input type="text" id="correctAnswer" placeholder="התשובה הנכונה">
+            </div>
+            <div class="form-group">
+                <label for="wrongAnswer1">תשובה שגויה 1:</label>
+                <input type="text" id="wrongAnswer1" placeholder="תשובה שגויה">
+            </div>
+            <div class="form-group">
+                <label for="wrongAnswer2">תשובה שגויה 2:</label>
+                <input type="text" id="wrongAnswer2" placeholder="תשובה שגויה">
+            </div>
+            <button onclick="addQuestion()">❓ הוסף שאלה</button>
         </div>
-        <span class="text-3xl opacity-30">❌</span>
-      </div>
-    </div>
-
-    <div class="stat-card purple">
-      <div class="flex justify-between items-start">
-        <div>
-          <p class="text-gray-600 text-sm font-semibold mb-2">👥 ייחודיים</p>
-          <div class="stat-number" id="stat-unique">0</div>
+        
+        <!-- הודעה כשאין שחקנים -->
+        <div class="section" id="noPlayersSection">
+            <div class="error-message">⚠️ אין שחקנים עדיין! הוסף שחקן קודם בסעיף למעלה כדי להוסיף שאלות.</div>
         </div>
-        <span class="text-3xl opacity-30">👤</span>
-      </div>
-    </div>
-
-    <div class="stat-card orange">
-      <div class="flex justify-between items-start">
-        <div>
-          <p class="text-gray-600 text-sm font-semibold mb-2">📅 היום</p>
-          <div class="stat-number" id="stat-today">0</div>
+        
+        <!-- רשימת שאלות -->
+        <div class="section">
+            <h2>📚 רשימת שאלות</h2>
+            <div class="list-container" id="questionsList">
+                <p style="color: #999; text-align: center;">אין שאלות עדיין</p>
+            </div>
         </div>
-        <span class="text-3xl opacity-30">🕐</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Chart -->
-  <div class="chart-container">
-    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-      <span class="text-2xl">📈</span>
-      פעילות ב-24 השעות האחרונות
-    </h2>
-    <canvas id="activityChart" height="80"></canvas>
-  </div>
-
-  <!-- Search & Filters -->
-  <div class="chart-container">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">🔍 חפש טלפון</label>
-        <input 
-          type="text" 
-          id="searchPhone"
-          placeholder="הקלד מספר..."
-          class="w-full px-4 py-2 border-2 border-gray-200 rounded-10 focus:outline-none focus:border-purple-500 transition"
-          onkeyup="filterLogs()"
-        >
-      </div>
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">⚙️ סנן סטטוס</label>
-        <select 
-          id="filterStatus"
-          onchange="filterLogs()"
-          class="w-full px-4 py-2 border-2 border-gray-200 rounded-10 focus:outline-none focus:border-purple-500 transition"
-        >
-          <option value="">הכל</option>
-          <option value="success">✓ הצלחות בלבד</option>
-          <option value="failed">✗ כשלונות בלבד</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">&nbsp;</label>
-        <button onclick="refreshLogs()" class="w-full btn btn-primary">🔄 רענן</button>
-      </div>
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">&nbsp;</label>
-        <button onclick="exportLogs()" class="w-full btn btn-success">📥 ייצוא CSV</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Logs Table -->
-  <div class="table-container">
-    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4">
-      <h2 class="text-xl font-bold flex items-center gap-2">
-        <span class="text-2xl">📝</span>
-        רשימת כל הניסיונות
-      </h2>
+        
+        <!-- ייצוא/ייבוא -->
+        <div class="section export-section">
+            <h2>💾 גיבוי נתונים</h2>
+            <div class="button-group">
+                <button onclick="downloadData()">⬇️ הורד גיבוי</button>
+                <button onclick="clearAllData()" style="background: #dc3545;">🗑️ מחק הכל</button>
+            </div>
+        </div>
     </div>
     
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead class="bg-gray-50 border-b-2 border-gray-200">
-          <tr>
-            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">📱 טלפון</th>
-            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">🕐 תאריך וזמן</th>
-            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">✓ סטטוס</th>
-            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">💬 סיבה</th>
-            <th class="px-6 py-4 text-right text-sm font-bold text-gray-700">🎵 הודעות</th>
-          </tr>
-        </thead>
-        <tbody id="logsTableBody">
-          <tr>
-            <td colspan="5" class="text-center py-12 text-gray-500">⏳ טוען נתונים...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Empty State -->
-  <div id="emptyState" class="hidden table-container">
-    <div class="empty-state">
-      <div class="empty-state-icon">📭</div>
-      <h3 class="text-2xl font-bold text-gray-900 mb-2">אין נתונים עדיין</h3>
-      <p class="text-gray-600">לא נרשמו ניסיונות התקשרות. חכה לניסיונות חדשים.</p>
-    </div>
-  </div>
-
-</div>
-
-<script>
-let allLogs = [];
-let chartInstance = null;
-
-function checkAuth() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const phone = urlParams.get('phone');
-  
-  if (phone) {
-    sessionStorage.setItem('adminPhone', phone);
-    return true;
-  }
-  
-  const stored = sessionStorage.getItem('adminPhone');
-  if (!stored) {
-    window.location.href = '/';
-    return false;
-  }
-  
-  return true;
-}
-
-function logout() {
-  sessionStorage.removeItem('adminPhone');
-  window.location.href = '/';
-}
-
-function goBack() {
-  window.location.href = '/';
-}
-
-async function refreshLogs() {
-  const phone = sessionStorage.getItem('adminPhone');
-  if (!phone) return;
-
-  try {
-    const response = await fetch(`/api/admin-logs?adminPhone=${encodeURIComponent(phone)}`);
-    const data = await response.json();
-
-    if (data.ok) {
-      allLogs = data.logs || [];
-      updateStats(data.stats);
-      renderLogs(allLogs);
-      updateChart(allLogs);
-      
-      document.getElementById('adminPhone').textContent = '📱 ' + phone;
-      
-      if (allLogs.length === 0) {
-        document.getElementById('emptyState').classList.remove('hidden');
-      } else {
-        document.getElementById('emptyState').classList.add('hidden');
-      }
-    } else {
-      document.getElementById('logsTableBody').innerHTML =
-        '<tr><td colspan="5" class="text-center py-12 text-red-600 font-bold">שגיאת שרת: ' +
-        (data.error || '') + (data.details ? ' - ' + data.details : '') + '</td></tr>';
-    }
-  } catch (err) {
-    console.error('Error:', err);
-    document.getElementById('logsTableBody').innerHTML =
-      '<tr><td colspan="5" class="text-center py-12 text-red-600 font-bold">שגיאת תקשורת: ' + err.message + '</td></tr>';
-  }
-}
-
-function updateStats(stats) {
-  document.getElementById('stat-total').textContent = stats.total || 0;
-  document.getElementById('stat-success').textContent = stats.successful || 0;
-  document.getElementById('stat-failed').textContent = stats.failed || 0;
-  document.getElementById('stat-unique').textContent = stats.unique_phones || 0;
-  document.getElementById('stat-today').textContent = stats.today || 0;
-}
-
-function renderLogs(logs) {
-  const tbody = document.getElementById('logsTableBody');
-  
-  if (logs.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-12 text-gray-500">אין נתונים</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = logs.map((log, idx) => `
-    <tr class="log-row">
-      <td class="px-6 py-4 font-bold text-base text-indigo-600">${log.phone}</td>
-      <td class="px-6 py-4 text-sm text-gray-600">
-        <div class="font-medium">${log.date || ''}</div>
-        <div class="text-xs text-gray-400">${log.time || ''}</div>
-      </td>
-      <td class="px-6 py-4">
-        ${log.success 
-          ? '<span class="status-badge status-success">✓ הצלחה</span>' 
-          : '<span class="status-badge status-failed">✗ כשל</span>'}
-      </td>
-      <td class="px-6 py-4 text-sm text-gray-700">${log.reason || '-'}</td>
-      <td class="px-6 py-4 text-center font-bold text-indigo-600">${log.messages_count || '-'}</td>
-    </tr>
-  `).join('');
-}
-
-function filterLogs() {
-  const phone = document.getElementById('searchPhone').value.toLowerCase();
-  const status = document.getElementById('filterStatus').value;
-
-  let filtered = allLogs;
-
-  if (phone) {
-    filtered = filtered.filter(log => log.phone.includes(phone));
-  }
-
-  if (status === 'success') {
-    filtered = filtered.filter(log => log.success);
-  } else if (status === 'failed') {
-    filtered = filtered.filter(log => !log.success);
-  }
-
-  renderLogs(filtered);
-}
-
-function updateChart(logs) {
-  const hours = {};
-  const now = new Date();
-
-  for (let i = 23; i >= 0; i--) {
-    const d = new Date(now);
-    d.setHours(d.getHours() - i);
-    const hour = d.getHours().toString().padStart(2, '0') + ':00';
-    hours[hour] = 0;
-  }
-
-  logs.forEach(log => {
-    const time = new Date(log.timestamp);
-    const hour = time.getHours().toString().padStart(2, '0') + ':00';
-    if (hours.hasOwnProperty(hour)) {
-      hours[hour]++;
-    }
-  });
-
-  const labels = Object.keys(hours);
-  const data = Object.values(hours);
-
-  if (chartInstance) {
-    chartInstance.data.labels = labels;
-    chartInstance.data.datasets[0].data = data;
-    chartInstance.update();
-  } else {
-    const ctx = document.getElementById('activityChart').getContext('2d');
-    chartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'מספר נסיונות',
-          data,
-          borderColor: '#667eea',
-          backgroundColor: 'rgba(102, 126, 234, 0.08)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 6,
-          pointBackgroundColor: '#667eea',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          pointHoverRadius: 8,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        plugins: { 
-          legend: { 
-            display: true, 
-            labels: { 
-              usePointStyle: true, 
-              font: { size: 13 },
-              padding: 20
-            } 
-          }
-        },
-        scales: { 
-          y: { 
-            beginAtZero: true, 
-            ticks: { stepSize: 1, font: { size: 12 } },
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          },
-          x: {
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          }
+    <script>
+        const STORAGE_KEY = 'triviaData';
+        
+        function getStoredData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : { players: [], questions: [] };
         }
-      }
-    });
-  }
-}
-
-function exportLogs() {
-  if (allLogs.length === 0) {
-    alert('אין נתונים לייצוא');
-    return;
-  }
-
-  const csv = [
-    ['מספר טלפון', 'תאריך', 'זמן', 'סטטוס', 'סיבה', 'הודעות'].join(','),
-    ...allLogs.map(log => [
-      log.phone,
-      log.date,
-      log.time,
-      log.success ? 'הצלחה' : 'כשל',
-      log.reason,
-      log.messages_count || '-'
-    ].map(v => `"${v}"`).join(','))
-  ].join('\n');
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'logs_' + new Date().toISOString().split('T')[0] + '.csv';
-  link.click();
-}
-
-// רענון אוטומטי כל 20 שניות
-setInterval(() => {
-  if (sessionStorage.getItem('adminPhone')) {
-    refreshLogs();
-  }
-}, 20000);
-
-// בדיקה התחלתית
-if (checkAuth()) {
-  refreshLogs();
-}
-</script>
-
+        
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updateUI();
+            showMessage('נשמר בהצלחה! ✅', 'success');
+        }
+        
+        function showMessage(text, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}-message">${text}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+        
+        function addPlayer() {
+            const idNumber = document.getElementById('idNumber').value.trim();
+            const playerName = document.getElementById('playerName').value.trim();
+            
+            if (!idNumber || !playerName) {
+                showMessage('אנא מלא את כל השדות', 'error');
+                return;
+            }
+            
+            const data = getStoredData();
+            
+            if (data.players.some(p => p.id === idNumber)) {
+                showMessage('קוד זהות זה כבר קיים!', 'error');
+                return;
+            }
+            
+            data.players.push({
+                id: idNumber,
+                name: playerName,
+                addedAt: new Date().toLocaleString('he-IL')
+            });
+            
+            document.getElementById('idNumber').value = '';
+            document.getElementById('playerName').value = '';
+            saveData(data);
+        }
+        
+        function deletePlayer(id) {
+            if (confirm('האם למחוק שחקן זה?')) {
+                const data = getStoredData();
+                data.players = data.players.filter(p => p.id !== id);
+                saveData(data);
+            }
+        }
+        
+        function addQuestion() {
+            const question = document.getElementById('question').value.trim();
+            const correctAnswer = document.getElementById('correctAnswer').value.trim();
+            const wrongAnswer1 = document.getElementById('wrongAnswer1').value.trim();
+            const wrongAnswer2 = document.getElementById('wrongAnswer2').value.trim();
+            
+            if (!question || !correctAnswer || !wrongAnswer1 || !wrongAnswer2) {
+                showMessage('אנא מלא את כל השדות', 'error');
+                return;
+            }
+            
+            const data = getStoredData();
+            
+            data.questions.push({
+                id: Date.now(),
+                question: question,
+                correctAnswer: correctAnswer,
+                wrongAnswers: [wrongAnswer1, wrongAnswer2],
+                addedAt: new Date().toLocaleString('he-IL')
+            });
+            
+            document.getElementById('question').value = '';
+            document.getElementById('correctAnswer').value = '';
+            document.getElementById('wrongAnswer1').value = '';
+            document.getElementById('wrongAnswer2').value = '';
+            saveData(data);
+        }
+        
+        function deleteQuestion(questionId) {
+            if (confirm('האם למחוק את השאלה?')) {
+                const data = getStoredData();
+                data.questions = data.questions.filter(q => q.id !== questionId);
+                saveData(data);
+            }
+        }
+        
+        function editQuestion(questionId) {
+            const data = getStoredData();
+            const question = data.questions.find(q => q.id === questionId);
+            
+            if (question) {
+                document.getElementById('question').value = question.question;
+                document.getElementById('correctAnswer').value = question.correctAnswer;
+                document.getElementById('wrongAnswer1').value = question.wrongAnswers[0];
+                document.getElementById('wrongAnswer2').value = question.wrongAnswers[1];
+                
+                deleteQuestion(questionId);
+                document.getElementById('question').focus();
+            }
+        }
+        
+        function updateUI() {
+            const data = getStoredData();
+            
+            // הצג/הסתר סעיף שאלות
+            const questionSection = document.getElementById('questionSection');
+            const noPlayersSection = document.getElementById('noPlayersSection');
+            
+            if (data.players.length === 0) {
+                questionSection.style.display = 'none';
+                noPlayersSection.style.display = 'block';
+            } else {
+                questionSection.style.display = 'block';
+                noPlayersSection.style.display = 'none';
+            }
+            
+            // עדכן ספירות
+            document.getElementById('playerCount').textContent = data.players.length;
+            document.getElementById('questionCount').textContent = data.questions.length;
+            
+            // עדכן רשימת שחקנים
+            const playersHTML = data.players.length === 0 
+                ? '<p style="color: #999; text-align: center;">אין שחקנים עדיין</p>'
+                : data.players.map(p => `
+                    <div class="list-item">
+                        <div class="item-info">
+                            <strong>🆔 ${p.name}</strong>
+                            <small>תעודת זהות: ${p.id}</small>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="delete-btn" onclick="deletePlayer('${p.id}')">🗑️ מחק</button>
+                        </div>
+                    </div>
+                `).join('');
+            document.getElementById('playersList').innerHTML = playersHTML;
+            
+            // עדכן רשימת שאלות
+            const questionsHTML = data.questions.length === 0
+                ? '<p style="color: #999; text-align: center;">אין שאלות עדיין</p>'
+                : data.questions.map((q, index) => `
+                    <div class="list-item">
+                        <div class="item-info">
+                            <strong>#${index + 1} ❓ ${q.question}</strong>
+                            <small>✅ תשובה: ${q.correctAnswer}</small>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="edit-btn" onclick="editQuestion(${q.id})">✏️ ערוך</button>
+                            <button class="delete-btn" onclick="deleteQuestion(${q.id})">🗑️ מחק</button>
+                        </div>
+                    </div>
+                `).join('');
+            document.getElementById('questionsList').innerHTML = questionsHTML;
+        }
+        
+        function downloadData() {
+            const data = getStoredData();
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `trivia-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+        
+        function clearAllData() {
+            if (confirm('האם אתה בטוח שברצונך למחוק את כל הנתונים? לא ניתן לשחזר את זה!')) {
+                localStorage.removeItem(STORAGE_KEY);
+                updateUI();
+                showMessage('כל הנתונים מחוקים', 'success');
+            }
+        }
+        
+        // עדכן את ה-UI כשהעמוד נטען
+        updateUI();
+        
+        // עדכן את ה-UI כל שנייה כדי לתפוס שינויים מקובצים אחרים
+        setInterval(updateUI, 1000);
+    </script>
 </body>
 </html>
